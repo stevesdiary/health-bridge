@@ -1,22 +1,32 @@
 import * as yup from 'yup';
 
 export const userRegistrationSchema = yup.object().shape({
-  id: yup.string().uuid().optional(),
-  name: yup.string().required('Name is required'),
-  email: yup.string().email('Invalid email format').required('Email is required'),
-  password: yup.string().trim()
-    .min(6, 'Password must be at least 6 characters')
+  name: yup
+    .string()
+    .trim()
+    .required('Name is required')
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name must be at most 50 characters'),
+  
+  email: yup
+    .string()
+    .trim()
+    .required('Email is required')
+    .email('Invalid email format'),
+  
+  password: yup
+    .string()
     .required('Password is required')
+    .min(8, 'Password must be at least 8 characters')
     .matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#-+={}\[\]\\]).{6,}$/,
-    "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
-  ),
-  confirm_password: yup.string()
-    .min(6, 'Password must be at least 6 characters')
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      'Password must include uppercase, lowercase, number, and special character'
+    ),
+  
+  confirm_password: yup
+    .string()
+    .required('Confirm Password is required')
     .oneOf([yup.ref('password')], 'Passwords must match')
-    .required('Confirm Password is required'),
-  phone: yup.string().optional(),
-  role: yup.string().optional(),
 });
 
 export const idSchema = yup.string().required('Id is required');
