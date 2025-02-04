@@ -1,7 +1,7 @@
 # care-compass
-healthconnect
+
 ER Diagram 
- link:  https://drive.google.com/file/d/1d5-jB5dWsItxADAXSd31_FpJJyiEqYcE/view?usp=drive_link
+ link: https://drive.google.com/file/d/1ndBOs5qsHX70zR0v7FLuskbXd1rmTBbM/view?usp=drive_link
 
 
 Project Title
