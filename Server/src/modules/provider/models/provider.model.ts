@@ -1,4 +1,4 @@
-import { col } from 'sequelize';
+
 import { Table, Column, Model, DataType, IsUUID, PrimaryKey, Unique, Default, AllowNull } from 'sequelize-typescript';
 
 @Table({
