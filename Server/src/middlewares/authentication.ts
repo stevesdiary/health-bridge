@@ -5,9 +5,6 @@ import { JwtPayload } from '../modules/types/type';
 
 const secret: string = process.env.JWT_SECRET || 'secret';
 
-// interface AuthenticatedRequest extends Request {
-//     user?: JwtPayload;
-// }
 const authentication = (req: Request, res: Response, next: NextFunction) => {
     if (!secret) {
         throw new Error('JWT_SECRET must be defined in environment variables');
@@ -18,7 +15,6 @@ const authentication = (req: Request, res: Response, next: NextFunction) => {
     }
     try {
         const decoded = jwt.verify(token, secret as string) as JwtPayload;
-        // return decoded;
         if (!decoded) {
             res.status(401).json({ message: 'Unauthorized' })
             return;
