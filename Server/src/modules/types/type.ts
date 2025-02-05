@@ -91,7 +91,12 @@ export interface VerificationResponse {
   statusCode: number;
   status: string;
   message: string;
-  data: unknown;
+  data?: unknown;
+}
+
+export interface VerificationRequestBody {
+  email: string;
+  code: string
 }
 
 export interface ProviderOnboardingResponse {
