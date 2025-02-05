@@ -29,12 +29,6 @@ export class User extends Model {
     type: DataType.STRING,
     allowNull: false
   })
-  user_id!: string;
-  
-  @Column({
-    type: DataType.STRING,
-    allowNull: false
-  })
   password!: string;
 
   @Default('user')
