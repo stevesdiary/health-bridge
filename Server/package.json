@@ -11,13 +11,13 @@
     "appointment",
     "healthinsurance"
   ],
-  "homepage": "https://github.com/stevesdiary/care-compass#readme",
+  "homepage": "https://github.com/stevesdiary/health-bridge#readme",
   "bugs": {
-    "url": "https://github.com/stevesdiary/care-compass/issues"
+    "url": "https://github.com/stevesdiary/health-bridge/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stevesdiary/care-compass.git"
+    "url": "git+https://github.com/stevesdiary/health-bridge.git"
   },
   "license": "Apache-2.0",
   "author": "Stephen Oyeyemi",
