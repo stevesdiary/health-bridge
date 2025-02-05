@@ -26,8 +26,8 @@ const userRegistration = {
           data: user.data
         });
       } catch (error: unknown) {
-        // Check for Yup validation error
         if (error instanceof yup.ValidationError) {
+          console.log('ERROR DUE TO VALIDATION', error)
           const errors: ValidationErrorResponse[] = error.inner.map(err => ({
             field: err.path || 'unknown',
             message: err.message
@@ -50,22 +50,50 @@ const userRegistration = {
       }
   },
 
-  verifyUser: async (req: VerifyRequest, res: Response): Promise<Response> => {
+  verifyUser: async (req: ExpressRequest, res: Response ): Promise<Response> => {
     try {
-      const verify = userVerificationSchema.validate(req.body, { abortEarly: false });
+      // console.log('Raw Request Body:', req.body);
+      const validatedData = await userVerificationSchema.validate(req.body, { abortEarly: false });
       
-      const { email, code } = verify as unknown as { email: string, code: string };
-      const verifyRequest: VerifyRequest = {
-        body: { email, code },
-      } as VerifyRequest;
-      const user = await verifyUser(verifyRequest);
-      return res.status(user.statusCode).send({ status: (user.status), message: (user.message), data: (user.data)})
-    } catch (error) {
-      return res.status(500).send({
-        error: error
-      })
+      console.log('Validated Data:', validatedData);
+
+      const { email, code } = validatedData;
+
+      const verificationResult = await verifyUser({ email, code });
+
+      // Respond based on verification result
+      return res.status(verificationResult.statusCode).json(verificationResult);
+
+      // const { email, code } = verify as unknown as { email: string, code: string };
+      // const verifyRequest: VerifyRequest = {
+      //   body: { email, code },
+      // } as VerifyRequest;
+      // const user = await verifyUser({email, code});
+      // return res.status(user.statusCode).send({
+      //   status: (user.status),
+      //   message: (user.message),
+      //   data: (user.data)
+      // })
+      
+    } catch (error: unknown) {
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failerd',
+          errors: error.errors.map(errorMsg => ({
+            message: errorMsg
+          }))
+        });
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: errorMessage
+      });
     }
-  },
+  }
 };
 
 export default userRegistration;
