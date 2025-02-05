@@ -49,8 +49,17 @@ export const loginSchema = yup.object().shape({
 });
 
 export const userVerificationSchema = yup.object().shape({
-  email: yup.string().email('Invalid email format').required('Email is required'),
-  code: yup.string().required('Verification code is required'),
+  email: yup
+    .string()
+    .trim()
+    .required('Email is required')
+    .email('Invalid email format'),
+  
+  code: yup
+    .string()
+    .trim()
+    .required('Verification code is required')
+    .length(6, 'Verification code must be 6 digits')
 });
 
 export const providerRegistrationSchema = yup.object().shape({
