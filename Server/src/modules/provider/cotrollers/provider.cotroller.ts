@@ -44,13 +44,13 @@ const providerController = {
   getProviders: async (req: Request, res: Response ) => {
     try {
       const searchData = await searchSchema.validate(req.body, {abortEarly: false, strict: true});
-      const providers = await getProviders(searchData);
-      return res.status(providers.statusCode).json({
-        status: providers.status,
-        message: providers.message,
-        data: providers
+      const hospitals = await getProviders(searchData);
+      return res.status(hospitals.statusCode).json({
+        status: hospitals.status,
+        message: hospitals.message,
+        data: hospitals
       })
-      // if(!providers) {
+      // if(!hospitals) {
         
       // }
     } catch (error) {
@@ -62,7 +62,7 @@ const providerController = {
         });
       }
       
-      console.error('Error fetching providers:', error);
+      console.error('Error fetching hospitals:', error);
       return res.status(500).json({
         status: 'error',
         message: 'Internal server error'
