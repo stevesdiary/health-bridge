@@ -16,7 +16,6 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
         email: userData.email,
       },
     });
-    // console.log('It got here service!');
     if (emailExists) {
       return {
         statusCode: 400,
@@ -57,11 +56,10 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
   }
 };
 
-export const verifyUser = async (req: VerifyRequest) => {
+export const verifyUser = async ({email, code}: {email: string, code: string}) => {
   try {
-    const { email, code } = req.body;
     const verificationCode = await getFromRedis(`"verify" + ${email}`);
-    console.log('Got vv from redis', verificationCode, code)
+    console.log('Got vv from redis', verificationCode, code, email)
     if (verificationCode === code) {
       await User.update(
         { verified: true },
