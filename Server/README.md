@@ -3,6 +3,9 @@
 ER Diagram 
  link: https://drive.google.com/file/d/1ndBOs5qsHX70zR0v7FLuskbXd1rmTBbM/view?usp=drive_link
 
+Documentation file: 
+https://docs.google.com/document/d/1zipFjZgw8wtmONrvRtq0mGytx18TFSBBsxL9eRQZ0vQ/edit?usp=sharing
+
 
 Project Title
 Simple overview of use/purpose.
