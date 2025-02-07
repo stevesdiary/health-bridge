@@ -1,11 +1,11 @@
 import { customAlphabet } from "nanoid";
 import bcrypt from "bcrypt";
+import {Op} from 'sequelize'
 
 import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
 import { User } from "../models/user.model";
 import sendEmail from "./email.service";
-import { VerificationResponse, VerifyRequest } from "../../types/type";
 
 const salt = process.env.BCRYPT_SALT || 10;
 
@@ -26,7 +26,8 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
     }
     const hashed = await bcrypt.hash(userData.password, salt);
     let userCreationData = {
-      name: userData.name,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
       email: userData.email,
       password: hashed,
     };
@@ -38,7 +39,7 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
       const verificationCode = nanoid;
       await saveToRedis(`"verify" + ${user.email}`, verificationCode, 600);
       const emailPayload = {
-        to: user.email,
+        to: user.email as string,
         subject: "Email Verification",
         text: `Your verification code is ${verificationCode}`,
       };
@@ -52,6 +53,7 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
       data: [userRegistrationData],
     };
   } catch (error) {
+    console.log('ERROR', error);
     throw error;
   }
 };
@@ -59,17 +61,31 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
 export const verifyUser = async ({email, code}: {email: string, code: string}) => {
   try {
     const verificationCode = await getFromRedis(`"verify" + ${email}`);
-    console.log('Got vv from redis', verificationCode, code, email)
     if (verificationCode === code) {
       await User.update(
         { verified: true },
         { where: { email } },
       );
-      console.log("User verification service", email, code);
       return {
         statusCode: 200,
         status: "success",
         message: "User verified",
+        data: null
+      };
+    }
+    const verifiedUser = await User.findOne(
+      { where: {
+        [Op.and]:[
+          { email: email },
+          { verified: true }
+        ],
+      } }
+    );
+    if (verifiedUser) {
+      return {
+        statusCode: 200,
+        status: "success",
+        message: "User already verified",
         data: null
       };
     }
