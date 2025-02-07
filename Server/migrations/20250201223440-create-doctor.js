@@ -4,16 +4,15 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     /**
-     * Add altering commands here.
-     *
+     * Add alterig commands here.
+     * 
      * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+     * await queryiterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('doctors', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
-        allowNull: false,
         defaultValue: Sequelize.UUIDV4
       },
       first_name: {
@@ -24,39 +23,33 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true
-      },
-      password: {
-        type: Sequelize.STRING,
-      },
-      role: {
-        type: Sequelize.STRING,
+      specialty: {
+        type: Sequelize.STRING
       },
       phone: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
-      date_of_birth: {
-        type: Sequelize.DATEONLY,
+      hospital_id: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'hospitals',
+          key: 'id'
+        }
       },
-      verified: {
+      available: {
         type: Sequelize.BOOLEAN,
-        defaultValue: false
-      },
-      is_active: {
-        type: Sequelize.BOOLEAN,
+        allowNull: false,
         defaultValue: true
       },
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
-        allowNull: false
+        defaultValue: Sequelize.NOW
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
-      },
-    });
+        defaultValue: Sequelize.NOW
+      }
+    })
   },
 
   async down (queryInterface, Sequelize) {
@@ -66,6 +59,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('doctors');
   }
-};
+}

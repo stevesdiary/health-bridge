@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
+import { AppointmentStatus } from './appointment.type';
 
 export interface UserAttributes {
-    name?: string;
+    first_name?: string;
+    last_name?: string;
     email?: string;
     password?: string;
     confirm_password?: string;
@@ -91,7 +93,12 @@ export interface VerificationResponse {
   statusCode: number;
   status: string;
   message: string;
-  data: unknown;
+  data?: unknown;
+}
+
+export interface VerificationRequestBody {
+  email: string;
+  code: string
 }
 
 export interface ProviderOnboardingResponse {
@@ -143,3 +150,30 @@ export interface ValidationErrorResponse {
   field: string;
   message: string;
 }
+
+export interface ApiResponse<T> {
+  statusCode: number;
+  status: 'success' | 'error' | 'fail';
+  message: string;
+  data: T | null;
+}
+
+export interface AppointmentCreateDTO {
+  user_id: string;        // Required in DTO but missing in validation
+  patient_id: string;
+  doctor_id: string;
+  date: string | Date;    // Allow both string and Date
+  start_time: string;
+  end_time: string;
+  reason?: string;        // Optional
+  note?: string;         // Required in DTO but missing in validation
+  status: AppointmentStatus;
+}
+
+// export interface AuthenticatedRequest extends Request {
+//   user?: {
+//     id: string;
+//     email: string;
+//     role: UserRole;
+//   };
+// }

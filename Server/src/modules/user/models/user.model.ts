@@ -1,58 +1,85 @@
-import { Table, Column, Model, DataType, IsUUID, PrimaryKey, Unique, Default, HasMany } from 'sequelize-typescript';
+import { 
+  Table, 
+  Column, 
+  Model, 
+  DataType, 
+  HasMany
+} from 'sequelize-typescript';
 import { Appointment } from '../../appointment/models/appointment.model';
+
+export enum UserRole {
+  PATIENT = 'PATIENT',
+  ADMIN = 'ADMIN',
+  STAFF = 'STAFF'
+}
 
 @Table({
   tableName: 'users',
   timestamps: true
 })
 export class User extends Model {
-  @IsUUID(4)
-  @PrimaryKey
-  @Default(DataType.UUIDV4)
-  @Column(DataType.UUID)
-  id!: string;
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true
+  })
+  id?: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  name!: string;
-
-  @Unique
-  @Column({
-    type: DataType.STRING,
-    allowNull: false
-  })
-  email!: string;
+  first_name?: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  user_id!: string;
-  
+  last_name?: string;
+
+  @Column({
+    type: DataType.STRING,
+    unique: true,
+    allowNull: false
+  })
+  email?: string;
+
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  password!: string;
+  password?: string;
 
-  @Default('user')
-  @Column(DataType.STRING)
-  role!: string;
+  @Column({
+    type: DataType.ENUM(...Object.values(UserRole)),
+    defaultValue: UserRole.PATIENT
+  })
+  role?: UserRole;
 
-  @Default(false)
-  @Column(DataType.BOOLEAN)
-  verified!: boolean;
+  @Column({
+    type: DataType.STRING
+  })
+  phone?: string;
+
+  @Column({
+    type: DataType.DATE
+  })
+  date_of_birth?: Date;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  })
+  verified?: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
+  })
+  is_active?: boolean;
 
   @HasMany(() => Appointment)
-  appointments!: Appointment[];
-}
-
-export interface IUserRegistration {
-  name: string;
-  email: string;
-  password: string;
-  role?: string;
-  verified?: boolean;
+  appointments?: Appointment[];
 }

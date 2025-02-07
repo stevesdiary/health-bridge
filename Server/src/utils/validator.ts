@@ -19,7 +19,7 @@ export const userRegistrationSchema = yup.object().shape({
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters')
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/,
       'Password must include uppercase, lowercase, number, and special character'
     ),
   
@@ -49,8 +49,17 @@ export const loginSchema = yup.object().shape({
 });
 
 export const userVerificationSchema = yup.object().shape({
-  email: yup.string().email('Invalid email format').required('Email is required'),
-  code: yup.string().required('Verification code is required'),
+  email: yup
+    .string()
+    .trim()
+    .required('Email is required')
+    .email('Invalid email format'),
+  
+  code: yup
+    .string()
+    .trim()
+    .required('Verification code is required')
+    .length(6, 'Verification code must be 6 digits')
 });
 
 export const providerRegistrationSchema = yup.object().shape({

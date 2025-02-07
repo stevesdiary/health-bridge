@@ -8,8 +8,7 @@ import { Response, Request as ExpressRequest } from 'express';
 const UserController = {
   getAllUsers: async (req: ExpressRequest, res: Response): Promise<Response> => {
     try {
-      const users: UserResponseData = await getAllUsers()
-      console.log(users);
+      const users: UserResponseData = await getAllUsers();
       return res.status(users.statusCode).send({
         status: users.status,
         message: users.message,
@@ -28,7 +27,7 @@ const UserController = {
         message: errorResponse.message,
         data: errorResponse.data
       });
-      }
+    }
     
   },
 
