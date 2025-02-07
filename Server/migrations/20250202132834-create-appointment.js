@@ -17,12 +17,14 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4
       },
       user_id: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      provider_id: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       status: {
         type: Sequelize.ENUM(['completed', 'scheduled', 'cancelled']),
@@ -51,8 +53,28 @@ module.exports = {
         }
       },
       time: {
-        type: Sequelize.TIME,
+        type: Sequelize.STRING,
         allowNull: false
+      },
+      doctor_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'doctors',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      hospital_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'hospitals',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       created_at: {
         type: Sequelize.DATE,
