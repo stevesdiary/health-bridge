@@ -1,50 +1,3 @@
-# care-compass
-
-ER Diagram 
- link: https://drive.google.com/file/d/1ndBOs5qsHX70zR0v7FLuskbXd1rmTBbM/view?usp=drive_link
-
-Documentation file: 
-https://docs.google.com/document/d/1zipFjZgw8wtmONrvRtq0mGytx18TFSBBsxL9eRQZ0vQ/edit?usp=sharing
-
-
-Project Title
-Simple overview of use/purpose.
-
-Description
-An in-depth paragraph about your project and overview of use.
-
-Getting Started
-Dependencies
-Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-ex. Windows 10
-Installing
-How/where to download your program
-Any modifications needed to be made to files/folders
-Executing program
-How to run the program
-Step-by-step bullets
-code blocks for commands
-Help
-Any advise for common problems or issues.
-
-command to run if program contains helper info
-Authors
-Contributors names and contact info
-
-ex. Dominique Pizzie
-ex. @DomPizzie
-
-Version History
-0.2
-Various bug fixes and optimizations
-See commit change or See release history
-0.1
-Initial Release
-License
-This project is licensed under the Apache-2.0 License - see the LICENSE.
-
-
-
 # HealthBridge 🏥
 
 ## Overview
@@ -169,21 +122,12 @@ git commit -m "feat: add patient appointment booking feature"
 - TypeScript intellisense
 
 ### Security Reporting
-For security vulnerabilities, please email security@healthbridge.org
+For security vulnerabilities, please email: 94493468+stevesdiary@users.noreply.github.com
 
 # HealthBridge Architecture
 
 ## High-Level Architecture
-```mermaid
-graph TD
-    A[Frontend] --> B[API Gateway]
-    B --> C[Authentication Service]
-    B --> D[Appointment Service]
-    B --> E[User Management Service]
-    D --> F[Database]
-    E --> F
-    C --> F
-```
+
 
 ## Microservices Overview
 1. **Authentication Service**
@@ -201,10 +145,11 @@ graph TD
    - Handles user data updates
 
 ## Database Schema
-[Link to database schema documentation]
+[[Link to database schema documentation]](https://drive.google.com/file/d/1ndBOs5qsHX70zR0v7FLuskbXd1rmTBbM/view?usp=drive_link)
 
 ## API Documentation
-[Link to Swagger/OpenAPI documentation]
+
+Link: https://docs.google.com/document/d/1zipFjZgw8wtmONrvRtq0mGytx18TFSBBsxL9eRQZ0vQ/edit?usp=sharing
 
 
 
@@ -234,13 +179,13 @@ Violations can result in:
 # Security Policy
 
 ## Supported Versions
-| Version | Supported          |
-|---------|-------------------|
-| 1.0.x   | :white_check_mark:|
-| < 1.0   | :x:               |
+| Version | Supported          
+|---------|-----------
+| 1.0.x   | ✅
+| < 1.0   | ❌               
 
 ## Reporting a Vulnerability
-1. Email: security@healthbridge.org
+1. Email: ‘94493468+stevesdiary@users.noreply.github.com’ 
 2. Encrypt communication if possible
 3. Provide detailed information about the vulnerability
 
@@ -250,5 +195,4 @@ Violations can result in:
 - Implement proper authentication
 - Regular dependency updates
 
-
-
+other updates will be added including features we intend to add.
