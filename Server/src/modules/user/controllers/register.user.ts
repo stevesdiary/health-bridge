@@ -3,7 +3,7 @@ import * as yup from 'yup';
 
 import { verifyUser, registerUser } from '../services/user.registration';
 import { userRegistrationSchema, userVerificationSchema } from '../../../utils/validator';
-import { TypedRequest, UserData, UserResponse, VerifyRequest } from '../../types/type';
+import { TypedRequest } from '../../types/type';
 
 interface ValidationErrorResponse {
   field: string;
@@ -39,9 +39,7 @@ const userRegistration = {
             errors
           });
         }
-        
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        
         return res.status(500).json({
           status: 'error',
           message: 'Internal server error',
@@ -52,29 +50,12 @@ const userRegistration = {
 
   verifyUser: async (req: ExpressRequest, res: Response ): Promise<Response> => {
     try {
-      // console.log('Raw Request Body:', req.body);
       const validatedData = await userVerificationSchema.validate(req.body, { abortEarly: false });
       
-      console.log('Validated Data:', validatedData);
-
       const { email, code } = validatedData;
-
       const verificationResult = await verifyUser({ email, code });
 
-      // Respond based on verification result
       return res.status(verificationResult.statusCode).json(verificationResult);
-
-      // const { email, code } = verify as unknown as { email: string, code: string };
-      // const verifyRequest: VerifyRequest = {
-      //   body: { email, code },
-      // } as VerifyRequest;
-      // const user = await verifyUser({email, code});
-      // return res.status(user.statusCode).send({
-      //   status: (user.status),
-      //   message: (user.message),
-      //   data: (user.data)
-      // })
-      
     } catch (error: unknown) {
       if (error instanceof yup.ValidationError) {
         return res.status(400).json({
