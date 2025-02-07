@@ -16,7 +16,11 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4
       },
-      name: {
+      first_name: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      last_name: {
         type: Sequelize.STRING,
         allowNull: false
       },
@@ -29,14 +33,21 @@ module.exports = {
         type: Sequelize.STRING,
       },
       role: {
-        type: Sequelize.ENUM('admin', 'user'),
-        allowNull: false,
-        defaultValue: 'user'
+        type: Sequelize.STRING,
+      },
+      phone: {
+        type: Sequelize.STRING,
+      },
+      date_of_birth: {
+        type: Sequelize.DATEONLY,
       },
       verified: {
         type: Sequelize.BOOLEAN,
-        allowNull: false,
         defaultValue: false
+      },
+      is_active: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
       },
       createdAt: {
         type: Sequelize.DATE,
