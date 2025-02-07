@@ -15,7 +15,7 @@ export const loginUser = async (email: string, password: string, res: Response) 
             return { statusCode: 404, status: "fail", message: "User not found", data: [] };
         }
 
-        const validPassword = await bcrypt.compare(password, user.password);
+        const validPassword = await bcrypt.compare(password, (user.password as string));
         if (!validPassword) {
             return { statusCode: 400, status: "fail", message: "Invalid password", data: [] };
         }
