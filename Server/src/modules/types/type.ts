@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AppointmentStatus } from './appointment.type';
+import { DoctorSpecialty } from '../doctor/model/doctor.model';
 
 export interface UserAttributes {
     first_name?: string;
@@ -11,6 +12,19 @@ export interface UserAttributes {
 
 export interface UserData extends Omit<UserAttributes, 'id'> {
   confirm_password?: string;
+}
+
+export interface DoctorRegistrationDTO {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  specialty: DoctorSpecialty;
+  hospital_email: string;
+}
+
+export interface DoctorRegistrationRequest extends Request {
+  body: DoctorRegistrationDTO;
 }
 
 export interface TypedRequest extends Request {

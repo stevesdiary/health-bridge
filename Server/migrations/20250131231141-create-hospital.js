@@ -19,13 +19,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      opening: {
+      phone: {
         type: Sequelize.STRING,
-        allowNull: true
       },
-      closing: {
-        type: Sequelize.STRING,
-        allowNull: true
+      email: {
+        type: Sequelize.STRING
+      },
+      open: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
       },
       address: {
         type: Sequelize.STRING,
@@ -35,16 +37,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      available: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: true
+      description: {
+        type: Sequelize.STRING,
       },
-      created_at: {
+      createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       },
-      updated_at: {
+      updatedAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       }

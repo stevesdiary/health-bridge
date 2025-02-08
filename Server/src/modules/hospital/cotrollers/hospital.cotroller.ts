@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import * as yup from 'yup';
 
-import { hospitalOnboarding } from '../services/hospital.onboarding';
+import { hospitalOnboarding, verifyHospital } from '../services/hospital.onboarding';
 import { getHospitals } from '../services/hospital.services';
-import { hospitalRegistrationSchema, searchSchema } from '../../../utils/validator';
+import { hospitalRegistrationSchema, searchSchema, hospitalVerificationSchema } from '../../../utils/validator';
 import { ProviderOnboardingResponse, SearchData } from '../../types/type';
 
 
 const hospitalController = {
-  register: async (req: Request, res: Response): Promise<Response> => {
+  registerHospital: async (req: Request, res: Response): Promise<Response> => {
     try {
       const validatedData = await hospitalRegistrationSchema.validate(req.body, { 
         abortEarly: false 
@@ -38,6 +38,34 @@ const hospitalController = {
         };
         console.error('Error creating hospital:', error);
         return res.status(500).send({ message: 'Error creating hospital', error: error });
+    }
+  },
+
+  verifyHospital: async (req: Request, res: Response ) => {
+    try {
+      const validatedData = await hospitalVerificationSchema.validate(req.body, { abortEarly: false });
+            
+      const { email, code } = validatedData;
+      const verificationResult = await verifyHospital({ email, code });
+
+      return res.status(verificationResult.statusCode).json(verificationResult);
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failerd',
+          errors: error.errors.map(errorMsg => ({
+            message: errorMsg
+          }))
+        });
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: errorMessage
+      });
     }
   },
 
