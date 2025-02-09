@@ -30,7 +30,11 @@ const hospitalController = {
         });
       }
       
-      return res.status(hospital.statusCode).json( response);
+      return res.status(hospital.statusCode).json({
+        status: hospital.status,
+        message: hospital.message,
+        data: hospital.data
+      });
       
     } catch (error) {
         if (error instanceof yup.ValidationError) {
