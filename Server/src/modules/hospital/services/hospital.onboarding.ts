@@ -7,18 +7,18 @@ import { CreationAttributes } from 'sequelize';
 
 export const hospitalOnboarding = async (hospitalData: CreationAttributes<Hospital>) => {
   try {
-    const emailExists = await Hospital.findOne({ 
+    const hospitalExists = await Hospital.findOne({ 
       where: { 
         email: hospitalData.email 
       } 
     });
 
-    if (emailExists) {
+    if (hospitalExists) {
       return {
         statusCode: 400,
         status: 'fail',
         message: 'Hospital already exists',
-        data: null
+        data: hospitalExists
       }
     }
     const hospital = await Hospital.create(hospitalData);
