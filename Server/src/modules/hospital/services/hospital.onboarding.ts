@@ -5,11 +5,11 @@ import { getFromRedis, saveToRedis } from '../../../core/redis';
 import sendEmail from '../../user/services/email.service';
 import { CreationAttributes } from 'sequelize';
 
-export const hospitalOnboarding = async (hospitalData: CreationAttributes<Hospital>) => {
+export const hospitalOnboarding = async (validatedData: CreationAttributes<Hospital>) => {
   try {
     const hospitalExists = await Hospital.findOne({ 
       where: { 
-        email: hospitalData.email 
+        email: validatedData.email 
       } 
     });
 
@@ -21,9 +21,17 @@ export const hospitalOnboarding = async (hospitalData: CreationAttributes<Hospit
         data: hospitalExists
       }
     }
-    const hospital = await Hospital.create(hospitalData);
-    if (hospital) {
-      const nanoid = customAlphabet('1234567890', 6)();
+    const hospital = await Hospital.create(validatedData);
+    if (!hospital) {
+      return {
+        statusCode: 500,
+        status: 'error',
+        message: 'Failed to register hospital ...',
+        data: null
+      };
+    };
+
+    const nanoid = customAlphabet('1234567890', 6)();
       const verificationCode = nanoid;
       let key = `verify:${hospital.email}`;
       await saveToRedis(key, verificationCode, 600);
@@ -33,11 +41,15 @@ export const hospitalOnboarding = async (hospitalData: CreationAttributes<Hospit
         text: `Your verification code is ${verificationCode}`,
       };
       await sendEmail(emailPayload);
-    }
+      return {
+        statusCode: 201,
+        status: "success",
+        message: "User registered",
+        data: hospital,
+      };
   } catch (error) {
     console.error('Error creating hospital:', error);
     throw new Error('Error creating hospital');
-    
   }
 }
 
