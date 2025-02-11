@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
+import { Request as ExpressRequest, Response } from 'express';
 import * as yup from 'yup';
 
 import { hospitalOnboarding, verifyHospital } from '../services/hospital.onboarding';
-import { getHospitals, getOneHospital } from '../services/hospital.services';
-import { hospitalRegistrationSchema, searchSchema, hospitalVerificationSchema } from '../../../utils/validator';
+import { getHospitals, getOneHospital, deleteHospital, updateHospital } from '../services/hospital.services';
+import { hospitalRegistrationSchema, searchSchema, hospitalVerificationSchema, idSchema, hospitalUpdateSchema } from '../../../utils/validator';
 import { ProviderOnboardingResponse, SearchData, ValidationErrorResponse, hospitalRegData } from '../../types/type';
 
 
@@ -51,7 +51,7 @@ const hospitalController = {
     }
   },
 
-  verifyHospital: async (req: Request, res: Response ) => {
+  verifyHospital: async (req: ExpressRequest, res: Response ) => {
     try {
       const validatedData = await hospitalVerificationSchema.validate(req.body, { abortEarly: false });
       
@@ -79,14 +79,14 @@ const hospitalController = {
     }
   },
 
-  getHospitals: async (req: Request, res: Response ) => {
+  getHospitals: async (req: ExpressRequest, res: Response ) => {
     try {
       const searchData = await searchSchema.validate(req.body, {abortEarly: false, strict: true});
       const hospitals = await getHospitals(searchData);
       return res.status(hospitals.statusCode).json({
         status: hospitals.status,
         message: hospitals.message,
-        data: hospitals
+        data: hospitals.data
       })
 
     } catch (error) {
@@ -106,17 +106,46 @@ const hospitalController = {
     }
   },
 
-  // getOneHospital: async (req: Request, res: Response ) => {
+  getOneHospital: async (req: ExpressRequest, res: Response): Promise<Response> => {
+    try {
+      const hospital = await getOneHospital(req.params.id);
+      return res.status(hospital.statusCode).send({ status: (hospital.status), message: (hospital.message), data: (hospital.data)})
+    } catch (error) {
+      return res.status(500).send({
+        error: error
+      })
+    }
+  },
 
-  // },
+  updateHospital: async (req: ExpressRequest, res: Response): Promise<Response> => {
+    try {
+      const id = req.params.id;
+      const validatedData = await hospitalUpdateSchema.validate(req.body, req.params);
+      const update = await updateHospital( id, validatedData);
+      return res.status(update.statusCode).send({ status: (update.status), message: (update.message), data: (update.data)})
+    } catch (error) {
+      return res.status(500).send({
+        error: error
+      });
+    }
+  },
 
-  // updateHospital: async ( req: Request, res: Response) => {
+  deleteHospital: async (req: ExpressRequest, res: Response): Promise<Response> => {
+    try {
+      const payload = await idSchema.validate(req.params.id);
 
-  // },
-
-  // removeHospital: async ( req: Request, res: Response) => {
-
-  // }
+      const deleteHospitalById = await deleteHospital(payload);
+      return res.status(deleteHospitalById.statusCode).send({
+        status: deleteHospitalById.status,
+        message: deleteHospitalById.message,
+        data: deleteHospitalById.data
+      })
+    } catch (error) {
+      return res.status(500).send({
+        error: error
+      });
+    }
+  }
 }
 
 export default hospitalController;

@@ -93,18 +93,32 @@ export const hospitalRegistrationSchema = yup.object().shape({
       /^(0[7-9]\d{9}|\+234[7-9]\d{9})$/, 
       'Invalid Nigerian phone number'
     ),
-  // state: yup.string().required('State is required'),
-  // city: yup.string().required('City is required'),
-  // specialisation: yup.string().optional(),
+  state: yup.string().required('State is required'),
+  city: yup.string().required('City is required'),
   address: yup.string().required('Address is required'),
   services: yup.array().of(yup.string()).optional(),
-  // opening_time: yup.string().required('Opening time is required'),
-  // closing_time: yup.string().required('Closing time is required'),
   open: yup.boolean().optional(),
-  // consultation_fee: yup.number().required('Consultation fee is required'),
-  // accepted_insurance: yup.array().of(yup.string()).optional(),
+  consultation_fee: yup.number().required('Consultation fee is required'),
+  accepted_insurance: yup.array().of(yup.string()).optional(),
   role: yup.string().optional(),
   rating: yup.number().optional()
+});
+export const hospitalUpdateSchema = yup.object().shape({
+  name: yup.string().required('Name is required'),
+  email: yup.string().email('Invalid email format').required('Email is required'),
+  phone: yup.string()
+    .required('Phone number is required')
+    .matches(
+      /^(0[7-9]\d{9}|\+234[7-9]\d{9})$/, 
+      'Invalid Nigerian phone number'
+    ),
+  state: yup.string().required('State is required'),
+  city: yup.string().required('City is required'),
+  address: yup.string().required('Address is required'),
+  services: yup.array().of(yup.string()).optional(),
+  open: yup.boolean().optional(),
+  consultation_fee: yup.number().required('Consultation fee is required'),
+  accepted_insurance: yup.array().of(yup.string()).optional(),
 });
 
 export const searchSchema = yup.object({

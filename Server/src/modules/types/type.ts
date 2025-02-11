@@ -36,6 +36,17 @@ export interface TypedRequest extends Request {
   };
 }
 
+export interface hospitalRegData extends Request {
+  body: {
+    name: string;
+    email: string;
+    address: string;
+    phone: string;
+    services: string[];
+
+  }
+}
+
 export interface VerifyRequest extends Request {
   body: {
     email: string;
