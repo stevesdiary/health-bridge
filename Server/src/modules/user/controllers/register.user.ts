@@ -3,12 +3,8 @@ import * as yup from 'yup';
 
 import { verifyUser, registerUser } from '../services/user.registration';
 import { userRegistrationSchema, userVerificationSchema } from '../../../utils/validator';
-import { TypedRequest } from '../../types/type';
+import { TypedRequest, ValidationErrorResponse } from '../../types/type';
 
-interface ValidationErrorResponse {
-  field: string;
-  message: string;
-}
 
 const userRegistration = {
   register: async (req: TypedRequest, res: Response): Promise<Response> => {

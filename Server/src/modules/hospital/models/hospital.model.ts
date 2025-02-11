@@ -30,6 +30,18 @@ export class Hospital extends Model {
     type: DataType.STRING
   })
   address?: string;
+  
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: false
+  // })
+  // state?: string;
+
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: false
+  // })
+  // city?: string
 
   @Column({
     type: DataType.STRING
@@ -56,6 +68,11 @@ export class Hospital extends Model {
     type: DataType.INTEGER
   })
   rating?: number
+
+  // @Column({
+  //   type: DataType.STRING
+  // })
+  // services?: string[]
 
   // Relationships
   @HasMany(() => Doctor)
@@ -96,17 +113,7 @@ export class Hospital extends Model {
 //   })
 //   address!: string;
 
-//   @Column({
-//     type: DataType.STRING,
-//     allowNull: false
-//   })
-//   state!: string;
 
-//   @Column({
-//     type: DataType.STRING,
-//     allowNull: false
-//   })
-//   city!: string
 
 //   @Column(DataType.TIME)
 //   opening_time!: string
