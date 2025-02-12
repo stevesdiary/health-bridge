@@ -1,72 +1,191 @@
-import { Request, Response, NextFunction } from 'express';
-import { AppointmentService } from '../services/appointment.service';
+import yup from 'yup';
+import { Response, Request as ExpressRequest } from 'express';
+import { appointmentCreateSchema, idSchema, searchSchema, updateAppointmentSchema } from '../../../utils/validator';
+import { AppointmentCreateDTO } from '../../types/appointment.type';
+import appointmentService from '../services/appointment.service';
+import { SearchData } from '../../types/type';
+import { Appointment } from '../models/appointment.model';
 
-export class AppointmentController {
-  private appointmentService: AppointmentService;
-
-  constructor() {
-    this.appointmentService = new AppointmentService();
-  }
-
-  createAppointment = async (req: Request, res: Response, next: NextFunction) => {
+const appointmentController = {
+  bookAppointment: async (req: ExpressRequest, res: Response) => {
     try {
-      const { user_id, provider_id, date, time } = req.body;
+      const validatedData = await appointmentCreateSchema.validate(req.body, {
+        abortEarly: false
+      });
 
-      if (!isValidTimeFormat(time)) {
+      const result = await appointmentService.createAppointment(
+        validatedData as unknown as AppointmentCreateDTO
+      );
+
+      return res.status(result.statusCode).json(result);
+    } catch (error) {
+      // if (error instanceof yup.ValidationError) {
+      //   return res.status(400).json({
+      //     statusCode: 400,
+      //     status: 'error',
+      //     message: 'Validation failed',
+      //     errors: error.errors
+      //   });
+      // }
+
+      console.error('Appointment Creation Error:', error);
+      return res.status(500).json({
+        statusCode: 500,
+        status: 'error',
+        message: 'Internal server error',
+        data: null
+      });
+    }
+  },
+
+  getAppointments: async (req: ExpressRequest, res: Response) => {
+    try {
+      const searchData = await searchSchema.validate(req.body, { abortEarly: false });
+      const appointments = await appointmentService.getAppointments(searchData);
+      return res.status(appointments.statusCode).json({
+        status: appointments.status,
+        message: appointments.message,
+        data: appointments.data
+      })
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
         return res.status(400).json({
           status: 'error',
-          message: 'Invalid time format. Please use HH:MM format',
+          message: 'Validation failed',
+          errors: error.errors
+        });
+      }
+      console.error('Error', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error'
+      });
+    }
+  },
+
+  getOneAppointmentRecord: async (req: ExpressRequest, res: Response) => {
+    try {
+      const id = await idSchema.validate(req.params.id, {abortEarly: false});
+      const getOneRecord = await appointmentService.getOneAppointmentRecord(id);
+      if (!getOneRecord) {
+        return res.status(404).json({
+          status: 'fail',
+          message: 'Appointment not found',
           data: null
-        })
+        });
+      }
+      return {
+        statusCode: getOneRecord.statusCode,
+        status: getOneRecord.status,
+        message: getOneRecord.message,
+        data: getOneRecord.data
+      }
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failed',
+          errors: error.errors
+        });
       }
       
-      const appointment = await this.appointmentService.createAppointment(
-        user_id, 
-        provider_id, 
-        new Date(date),
-        time
-      );
-
-      res.status(201).json(appointment);
-    } catch (error) {
-      res.status(400).json({ error: 'Server error' });
+      console.error('Error: ', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error'
+      });
     }
-  }
+  },
 
-  getUserAppointments = async (req: Request, res: Response) => {
+  updateAppointment: async (req: ExpressRequest, res: Response): Promise<Response> => {
     try {
-      const user_id = req.params.user_id;
-      const appointments = await this.appointmentService.getUserAppointments(user_id);
-      
-      res.status(200).json(appointments);
-    } catch (error) {
-      res.status(500).json({ error: 'Server error' });
-    }
-  }
-
-  cancelAppointment = async (req: Request, res: Response) => {
-    try {
-      const { appointment_id } = req.params;
-      if (!req.user){
-        return res.status(401).json({ error: 'Unauthorized' });
+      const id = await idSchema.validate(req.params.id, {abortEarly: false});
+      const status = await updateAppointmentSchema.validate(req.body, {abortEarly: false });
+      const updateAppointment = await appointmentService.updateAppointment(id, status);
+      if (!updateAppointment) {
+        return res.status(500).json({
+          status: 'error',
+          message: 'Failed to update appointment',
+          data: null
+        });
       }
-      const user_id = req.user.id;
 
-      const appointment = await this.appointmentService.cancelAppointment(
-        appointment_id, 
-        user_id
-      );
+      return res.status(updateAppointment.statusCode).json({
+        status: updateAppointment.status,
+        message: updateAppointment.message,
+        data: updateAppointment.data
+      });
 
-      res.status(200).json(appointment);
     } catch (error) {
-      console.log('Error', error)
-      res.status(400).json({ error: 'Error occured' });
+      // if (error instanceof yup.ValidationError) {
+      //   return res.status(400).json({
+      //     status: 'error',
+      //     message: 'Validation failed',
+      //     errors: error.errors
+      //   });
+      // }
+      
+      console.error('Error:', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error'
+      });
+    }
+  },
+
+  deleteAppointmentRecord: async (req: ExpressRequest, res: Response) => {
+    try {
+      const id = await idSchema.validate(req.params.id, {abortEarly: false});
+      const deleteAppointment = await appointmentService.deleteAppointmentRecord(id);
+      return {
+        statusCode: deleteAppointment.statusCode,
+        status: deleteAppointment.status,
+        message: deleteAppointment.message,
+        data: deleteAppointment.data
+      }
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failed',
+          errors: error.errors
+        });
+      }
+      
+      console.error('Error: ', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error'
+      });
+    }
+  },
+
+  cancelAppointment: async (req: ExpressRequest, res: Response) => {
+    try {
+      const id = await idSchema.validate(req.params.id, {abortEarly: false});
+      const cancelAppoinntmet = await appointmentService.cancelAppointment(id);
+      return {
+        statusCode: cancelAppoinntmet?.statusCode,
+        status: cancelAppoinntmet?.status,
+        message: cancelAppoinntmet?.message,
+        data: cancelAppoinntmet?.data
+      }
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failed',
+          errors: error.errors
+        });
+      }
+      
+      console.error('Error: ', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error'
+      });     
     }
   }
 }
 
-function isValidTimeFormat(time: string): boolean {
-  // Regular expression to match HH:MM format (24-hour)
-  const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
-  return timeRegex.test(time);
-}
+export default appointmentController;
