@@ -1,6 +1,7 @@
 import { Column, Table, Model, IsUUID, DataType, Default, PrimaryKey, AllowNull, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { User } from "../../user/models/user.model";
-import { Provider } from "../../provider/models/provider.model";
+import { Hospital } from "../../hospital/models/hospital.model";
+import { Doctor } from "../../doctor/model/doctor.model";
 
 @Table({
   tableName: 'appointments',
@@ -22,7 +23,7 @@ export class Appointment extends Model {
 
   @Column({
     type: DataType.BOOLEAN,
-    allowNull: false
+    defaultValue: false
   })
   reminder_sent!: boolean;
 
@@ -54,17 +55,20 @@ export class Appointment extends Model {
   @BelongsTo(() => User)
   user!: User
 
-
-  @ForeignKey(() => Provider)
+  @ForeignKey(() => Doctor)  // Add this decorator
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false
   })
-  provider_id!: string
+  doctor_id!: string;
+
+  @ForeignKey(() => Hospital)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false
+  })
+  hospital_id!: string
+
+  @BelongsTo(() => Doctor)
+  doctors!: Doctor;
 }
-
-// export interface IAppointment {
-//   name: string;
-//   email: string;
-
-// }
