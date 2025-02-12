@@ -128,28 +128,27 @@ export const searchSchema = yup.object({
 });
 
 export const appointmentCreateSchema = yup.object().shape({
-  patient_id: yup.string().uuid('Invalid user ID').required('User ID is required'),
+  user_id: yup.string().uuid('Invalid user ID').required('User ID is required'),
   doctor_id: yup.string().uuid('Invalid doctor ID').required('Doctor ID is required'),
-  date: yup.date()
-    .min(new Date(), 'Appointment date cannot be in the past')
-    .required('Appointment date is required'),
-  start_time: yup.string()
-    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:MM)')
-    .required('Start time is required'),
-  end_time: yup.string()
-    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:MM)')
-    .required('End time is required')
-    .test('is-after-start', 'End time must be after start time', function(end_time) {
-      const { start_time } = this.parent;
-      return new Date(`1970-01-01T${end_time}`) > new Date(`1970-01-01T${start_time}`);
-    }),
-  reason: yup.string()
-    .min(5, 'Reason must be at least 5 characters')
-    .max(500, 'Reason cannot exceed 500 characters')
-    .required('Appointment reason is required'),
+  // date: yup.date()
+  //   .min(new Date(), 'Appointment date cannot be in the past')
+  //   .required('Appointment date is required'),
+  time: yup.string().required(),
+  hospital_id: yup.string().required(),
+  date: yup.string()
+    .matches(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
+    .required('Date is required'),
+  // start_time: yup.string()
+  //   .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)')
+  //   .required('Start time is required'),
+  // end_time: yup.string()
+  //   .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)')
+  //   .required('End time is required'),
+  note: yup.string().max(500, 'Note cannot exceed 500 characters'),
+  // status: yup.string().oneOf(Object.values(AppointmentStatus)),
   status: yup.mixed<AppointmentStatus>()
     .oneOf(Object.values(AppointmentStatus), 'Invalid appointment status')
-    .default(AppointmentStatus.PENDING)
+    .default(AppointmentStatus.SCHEDULED)
 });
 
 export const doctorRegistrationSchema = yup.object().shape({
@@ -168,3 +167,5 @@ export const doctorRegistrationSchema = yup.object().shape({
   hospital_email: yup.string()
     .required('Hospital email is required'),
 });
+
+export const updateAppointmentSchema = yup.string().required('Status is required');
