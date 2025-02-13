@@ -17,11 +17,11 @@ userRouter.post("/verify", async (req: ExpressRequest, res: Response) => {
   await userRegistration.verifyUser(req, res);
 });
 
-userRouter.get('/all', authentication, checkRole(['PATIENT', 'ADMIN']), async (req: ExpressRequest, res: Response) => {
+userRouter.get('/all', async (req: ExpressRequest, res: Response) => {
   await userController.getAllUsers(req, res)
 });
 
-userRouter.get('/one/:id', checkRole(['user', 'admin']), async (req: ExpressRequest, res: Response) => {
+userRouter.get('/one/:id', async (req: ExpressRequest, res: Response) => {
   await userController.getOneUser(req, res);
 });
 
