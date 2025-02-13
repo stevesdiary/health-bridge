@@ -13,5 +13,19 @@ doctorRouter.post('/register', async (req: ExpressRequest, res: Response) => {
 doctorRouter.post('/verify', async (req: ExpressRequest, res: Response) => {
   await doctorController.verifyDoctor(req, res);
 })
+doctorRouter.get('/all', async (req: ExpressRequest, res: Response) => {
+  await doctorController.verifyDoctor(req, res);
+})
+doctorRouter.get('/one/:id', async (req: ExpressRequest, res: Response) => {
+  // await doctorController.geyOneDoctor(req, res);
+})
+doctorRouter.put('/update/:id', async (req: ExpressRequest, res: Response) => {
+  await doctorController.verifyDoctor(req, res);
+})
+doctorRouter.delete('/delete/:id', async (req: ExpressRequest, res: Response) => {
+  await doctorController.verifyDoctor(req, res);
+})
+
+
 
 export default doctorRouter;
