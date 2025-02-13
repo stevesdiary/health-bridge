@@ -27,16 +27,14 @@ module.exports = {
         onDelete: 'CASCADE'
       },
       status: {
-        type: Sequelize.ENUM(['completed', 'scheduled', 'cancelled']),
+        type: Sequelize.ENUM('completed', 'scheduled', 'cancelled'),
         allowNull: false,
         defaultValue: 'scheduled',
         comment: 'Current appointment state'
       },
       reminder_sent: {
         type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-        comment: 'Flag if reminder notification was sent'
+        defaultValue: false
       },
       notes: {
         type: Sequelize.STRING,
