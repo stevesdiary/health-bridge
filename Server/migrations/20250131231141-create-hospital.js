@@ -25,6 +25,15 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
+      city: {
+        type: Sequelize.STRING
+      },
+      state: {
+        type: Sequelize.STRING
+      },
+      consultation_fee: {
+        type: Sequelize.BIGINT
+      },
       open: {
         type: Sequelize.BOOLEAN,
         defaultValue: true
@@ -39,6 +48,9 @@ module.exports = {
       },
       description: {
         type: Sequelize.STRING,
+      },
+      verified: {
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         type: Sequelize.DATE,
