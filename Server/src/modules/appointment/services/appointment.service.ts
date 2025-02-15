@@ -1,20 +1,25 @@
+import { Op } from 'sequelize';
+
 import { Appointment } from '../models/appointment.model';
 import { User } from '../../user/models/user.model';
 import { Hospital } from '../../hospital/models/hospital.model';
-
 import { AppointmentCreateDTO, AppointmentStatus, AppointmentResponse } from '../../types/appointment.type';
 import { Doctor } from '../../doctor/model/doctor.model';
-// import { User } from '../../user/models/user.model';
-import { ApiResponse } from '../../types/type';
+import { ApiResponse, SearchData } from '../../types/type';
 import sequelize from '../../../core/database';
-import { Op } from 'sequelize';
 
-export class AppointmentService {
-  async createAppointment(
+
+
+const appointmentService = {
+  createAppointment: async (
     appointmentData: AppointmentCreateDTO
-  ): Promise<ApiResponse<AppointmentResponse>> {
+  ): Promise<ApiResponse<AppointmentResponse>> => {
     const transaction = await sequelize.transaction();
+    console.log('Appointment Data:', JSON.stringify(appointmentData, null, 2));
 
+    Object.keys(appointmentData).forEach(key => {
+      console.log(`${key} type:`, typeof appointmentData[key]);
+    });
     try {
       const conflictingAppointment = await Appointment.findOne({
         where: {
@@ -52,10 +57,10 @@ export class AppointmentService {
         };
       }
 
-      // Verify doctor and user exist
-      const [doctor, user] = await Promise.all([
+      const [doctor, user, hospital] = await Promise.all([
         Doctor.findByPk(appointmentData.doctor_id, { transaction }),
-        User.findByPk(appointmentData.patient_id, { transaction })
+        User.findByPk(appointmentData.user_id, { transaction }),
+        Hospital.findByPk(appointmentData.hospital_id, { transaction })
       ]);
 
       if (!doctor) {
@@ -78,11 +83,21 @@ export class AppointmentService {
         };
       }
 
+      if (!hospital) {
+        await transaction.rollback();
+        return {
+          statusCode: 404,
+          status: 'fail',
+          message: 'Hospital not found',
+          data: null
+        };
+      }
+
       // Create appointment
       const appointment = await Appointment.create(
         {
           ...appointmentData,
-          status: AppointmentStatus.PENDING
+          status: AppointmentStatus.SCHEDULED
         },
         { transaction }
       );
@@ -96,7 +111,7 @@ export class AppointmentService {
         data: {
           id: appointment.id,
           ...appointmentData,
-          status: AppointmentStatus.PENDING
+          status: AppointmentStatus.SCHEDULED
         }
       };
     } catch (error) {
@@ -110,8 +125,119 @@ export class AppointmentService {
         data: null
       };
     }
+  },
+
+  getAppointments: async (SearchData: SearchData) => {
+    try {
+      const appointments = await Appointment.findAll();
+      if (! appointmentService || appointments.length === 0) {
+        return {
+          statusCode: 404,
+          status: 'fail',
+          message: 'No appointments found',
+          data: null,
+        };        
+      }
+      return {
+        statusCode: 200,
+        status: 'success',
+        message: 'Appointments fetched from database',
+        data: appointments,
+      };      
+    } catch (error) { 
+      console.error('Error in get appointment service:', error);
+      throw new Error('Failed to fetch hospitals');
+    }
+  },
+
+  getOneAppointmentRecord: async (id: string) => {
+    try {
+      const getOne = await Appointment.findByPk(id);
+      if (!getOne) {
+        return {
+          statusCode: 404,
+          status: 'fail',
+          message: 'Record not found',
+          data: null
+        }
+      }
+      return {
+        statusCode: 200,
+        status: 'success',
+        message: 'Record found',
+        data: getOne
+      }
+    } catch (error) {
+      
+    }
+  },
+
+  updateAppointment: async (id: string, status: string) => {
+    try {
+      const update = await Appointment.update(
+        { status: status},
+        {where: {id}},
+      )
+      if (update) {
+        return {
+          statusCode: 200,
+          status: 'success',
+          message: 'Appointment updated',
+          data: null
+        }
+      }
+    } catch (error) {
+      console.log('Error cancelling appoitmet', error);
+      throw error;
+    }
+  },
+
+  cancelAppointment: async (id: string) => {
+    try {
+      const cancel = await Appointment.update(
+        { status: 'cancelled'},
+        {where: {id}},
+      )
+      if (cancel) {
+        return {
+          statusCode: 200,
+          status: 'success',
+          message: 'Appointment cancelled',
+          data: null
+        }
+      }
+    } catch (error) {
+      console.log('Error cancelling appoitmet', error);
+      throw error;
+    }
+  },
+
+  deleteAppointmentRecord: async (id: string) => {
+    try {
+      const deleteRecord = await Appointment.destroy(
+        {where: {id}},
+      )
+      if (deleteRecord > 0) {
+        return {
+          statusCode: 200,
+          status: 'success',
+          message: 'Appointment record deleted',
+          data: null
+        }
+      }
+
+      return {
+        statusCode: 404,
+        status: 'fail',
+        message: 'Appointment record not found or already deleted',
+        data: null        
+      }
+    } catch (error) {
+      console.log('Error deleting appoitmet record', error);
+      throw error;
+    }
   }
 }
 
-export const appointmentService = new AppointmentService();
+export default appointmentService;
 
