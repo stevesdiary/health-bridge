@@ -13,8 +13,7 @@ const appointmentController = {
         abortEarly: false,
         stripUnknown: true
       });
-
-      // const validatedData = req.body;
+      
       const calculateEndTime = (startTime: string): string => {
         const [hours, minutes] = startTime.split(':').map(Number);
         const date = new Date();
