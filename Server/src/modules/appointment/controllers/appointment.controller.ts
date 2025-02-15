@@ -10,27 +10,48 @@ const appointmentController = {
   bookAppointment: async (req: ExpressRequest, res: Response) => {
     try {
       const validatedData = await appointmentCreateSchema.validate(req.body, {
-        abortEarly: false
+        abortEarly: false,
+        stripUnknown: true
       });
 
-      const result = await appointmentService.createAppointment(
-        validatedData as unknown as AppointmentCreateDTO
-      );
+      // const validatedData = req.body;
+      const calculateEndTime = (startTime: string): string => {
+        const [hours, minutes] = startTime.split(':').map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes + 30);
+        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+      };
 
-      return res.status(result.statusCode).json(result);
+      const appointmentData: AppointmentCreateDTO = {
+        user_id: validatedData.user_id,
+        doctor_id: validatedData.doctor_id,
+        hospital_id: validatedData.hospital_id,
+        date: validatedData.date,
+        start_time: validatedData.start_time,
+        end_time: validatedData.end_time || calculateEndTime(validatedData.start_time),
+        notes: validatedData.notes || ''
+      };
+  
+      const result = await appointmentService.createAppointment(appointmentData);
+      return res.status(result.statusCode).json({
+        status: result.status,
+        message: result.message,
+        data: result.data
+      });
     } catch (error) {
-      // if (error instanceof yup.ValidationError) {
-      //   return res.status(400).json({
-      //     statusCode: 400,
-      //     status: 'error',
-      //     message: 'Validation failed',
-      //     errors: error.errors
-      //   });
-      // }
-
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failed',
+          errors: error.inner.map(err => ({
+            field: err.path || 'unknown',
+            message: err.message
+          }))
+        });
+      }
+  
       console.error('Appointment Creation Error:', error);
       return res.status(500).json({
-        statusCode: 500,
         status: 'error',
         message: 'Internal server error',
         data: null
