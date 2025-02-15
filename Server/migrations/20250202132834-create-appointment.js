@@ -50,7 +50,11 @@ module.exports = {
           isAfter: new Date().toISOString().split('T')[0]
         }
       },
-      time: {
+      start_time: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      end_time: {
         type: Sequelize.STRING,
         allowNull: false
       },
