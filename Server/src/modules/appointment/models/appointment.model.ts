@@ -50,7 +50,13 @@ export class Appointment extends Model {
     type: DataType.STRING,
     allowNull: false
   })
-  time!: string;
+  start_time!: string;
+  
+  @Column({
+    type: DataType.STRING,
+    allowNull: false
+  })
+  end_time!: string;
 
   @BelongsTo(() => User)
   user!: User
