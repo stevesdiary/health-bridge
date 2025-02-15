@@ -7,7 +7,7 @@ import { AppointmentCreateDTO, AppointmentStatus, AppointmentResponse } from '..
 import { Doctor } from '../../doctor/model/doctor.model';
 import { ApiResponse, SearchData } from '../../types/type';
 import sequelize from '../../../core/database';
-import { date } from 'yup';
+
 
 
 const appointmentService = {
@@ -15,30 +15,34 @@ const appointmentService = {
     appointmentData: AppointmentCreateDTO
   ): Promise<ApiResponse<AppointmentResponse>> => {
     const transaction = await sequelize.transaction();
+    console.log('Appointment Data:', JSON.stringify(appointmentData, null, 2));
 
+    Object.keys(appointmentData).forEach(key => {
+      console.log(`${key} type:`, typeof appointmentData[key]);
+    });
     try {
       const conflictingAppointment = await Appointment.findOne({
         where: {
           doctor_id: appointmentData.doctor_id,
           date: appointmentData.date,
-          // [Op.or]: [
-          //   {
-          //     start_time: {
-          //       [Op.between]: [
-          //         appointmentData.start_time, 
-          //         appointmentData.end_time
-          //       ]
-          //     }
-          //   },
-            // {
-            //   end_time: {
-            //     [Op.between]: [
-            //       appointmentData.start_time, 
-            //       appointmentData.end_time
-            //     ]
-            //   }
-            // }
-          // ]
+          [Op.or]: [
+            {
+              start_time: {
+                [Op.between]: [
+                  appointmentData.start_time, 
+                  appointmentData.end_time
+                ]
+              }
+            },
+            {
+              end_time: {
+                [Op.between]: [
+                  appointmentData.start_time, 
+                  appointmentData.end_time
+                ]
+              }
+            }
+          ]
         },
         transaction
       });
@@ -53,10 +57,10 @@ const appointmentService = {
         };
       }
 
-      // Verify doctor and user exist
-      const [doctor, user] = await Promise.all([
+      const [doctor, user, hospital] = await Promise.all([
         Doctor.findByPk(appointmentData.doctor_id, { transaction }),
-        User.findByPk(appointmentData.user_id, { transaction })
+        User.findByPk(appointmentData.user_id, { transaction }),
+        Hospital.findByPk(appointmentData.hospital_id, { transaction })
       ]);
 
       if (!doctor) {
@@ -75,6 +79,16 @@ const appointmentService = {
           statusCode: 404,
           status: 'fail',
           message: 'User not found',
+          data: null
+        };
+      }
+
+      if (!hospital) {
+        await transaction.rollback();
+        return {
+          statusCode: 404,
+          status: 'fail',
+          message: 'Hospital not found',
           data: null
         };
       }
