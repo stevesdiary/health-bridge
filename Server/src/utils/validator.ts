@@ -128,28 +128,62 @@ export const searchSchema = yup.object({
 });
 
 export const appointmentCreateSchema = yup.object().shape({
-  user_id: yup.string().uuid('Invalid user ID').required('User ID is required'),
-  doctor_id: yup.string().uuid('Invalid doctor ID').required('Doctor ID is required'),
-  // date: yup.date()
-  //   .min(new Date(), 'Appointment date cannot be in the past')
-  //   .required('Appointment date is required'),
-  time: yup.string().required(),
-  hospital_id: yup.string().required(),
+  user_id: yup.string()
+    .transform((value) => value?.replace(/^"|"$/g, ''))
+    .required('User ID is required'),
+  doctor_id: yup.string()
+    .transform((value) => value?.replace(/^"|"$/g, ''))
+    .required('Doctor ID is required'),
+  hospital_id: yup.string()
+    .transform((value) => value?.replace(/^"|"$/g, ''))
+    .required('Hospital ID is required'),
   date: yup.string()
-    .matches(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
+    .transform((value) => value?.replace(/^"|"$/g, ''))
     .required('Date is required'),
-  // start_time: yup.string()
-  //   .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)')
-  //   .required('Start time is required'),
-  // end_time: yup.string()
-  //   .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)')
-  //   .required('End time is required'),
-  note: yup.string().max(500, 'Note cannot exceed 500 characters'),
-  // status: yup.string().oneOf(Object.values(AppointmentStatus)),
-  status: yup.mixed<AppointmentStatus>()
-    .oneOf(Object.values(AppointmentStatus), 'Invalid appointment status')
-    .default(AppointmentStatus.SCHEDULED)
+  start_time: yup.string()
+    .transform((value) => value?.replace(/^"|"$/g, ''))
+    .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:mm)')
+    .required('Start time is required'),
+  end_time: yup.string()
+    .transform((value) => value?.replace(/^"|"$/g, ''))
+    .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:mm)')
+    .required('End time is required'),
+  notes: yup.string()
+    .transform((value) => value?.replace(/^"|"$/g, ''))
+    .optional(),
 });
+// .transform((value) => {
+//   // Define Record type for the accumulator
+//   return Object.keys(value).reduce<Record<string, unknown>>((acc, key) => {
+//     acc[key] = typeof value[key] === 'string' 
+//       ? value[key].replace(/^"|"$/g, '') 
+//       : value[key];
+//     return acc;
+//   }, {});
+// })
+
+// export const appointmentCreateSchema = yup.object().shape({
+//   user_id: yup.string().required('User ID is required'),
+//   doctor_id: yup.string().required('Doctor ID is required'),
+//   // date: yup.date()
+//   //   .min(new Date(), 'Appointment date cannot be in the past')
+//   //   .required('Appointment date is required'),
+//   time: yup.string().required('Time is required'),
+//   hospital_id: yup.string().required('Hospital Id is required'),
+//   date: yup.string()
+//     // .matches(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
+//     .required('Date is required'),
+//   note: yup.string().max(500, 'Note cannot exceed 500 characters'),
+//   // start_time: yup.string()
+//   //   .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)')
+//   //   .required('Start time is required'),
+//   // end_time: yup.string()
+//   //   .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)')
+//   //   .required('End time is required'),
+  
+//   // status: yup.string().oneOf(Object.values(AppointmentStatus)),
+//   status: yup.string().oneOf(['scheduled', 'cancelled', 'completed']).required()
+// });
 
 export const doctorRegistrationSchema = yup.object().shape({
   first_name: yup.string()
