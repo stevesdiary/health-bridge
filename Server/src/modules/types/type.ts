@@ -202,3 +202,20 @@ export interface AppointmentCreateDTO {
 //     role: UserRole;
 //   };
 // }
+
+export interface ApiResponse<T> {
+  statusCode: number;
+  status: 'success' | 'error' | 'fail';
+  message: string;
+  data: T | null;
+}
+
+export interface AppointmentResponse {
+  id: string;
+  doctor_id: string;
+  patient_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  status: AppointmentStatus;
+}
