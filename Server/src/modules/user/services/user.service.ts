@@ -1,6 +1,3 @@
-import { customAlphabet } from "nanoid";
-import bcrypt from "bcrypt";
-
 import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
 import { User } from "../models/user.model";
