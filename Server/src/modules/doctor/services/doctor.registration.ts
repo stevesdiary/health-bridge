@@ -30,7 +30,7 @@ export const registerDoctor = async (validatedDoctorInfo: DoctorRegistrationDTO)
     }
     
     let hospital_id = hospital?.id;
-    console.log("HOSPITAL ID", hospital_id);
+    // console.log("HOSPITAL ID", hospital_id);
 
     if (hospital_id) {
       let doctorRegistrationData = {
