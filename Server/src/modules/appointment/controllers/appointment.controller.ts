@@ -1,10 +1,8 @@
 import yup from 'yup';
 import { Response, Request as ExpressRequest } from 'express';
-import { appointmentCreateSchema, idSchema, searchSchema, updateAppointmentSchema } from '../../../utils/validator';
+import { appointmentCreateSchema, idSchema, searchSchema, appointmentStatusSchema } from '../../../utils/validator';
 import { AppointmentCreateDTO } from '../../types/appointment.type';
 import appointmentService from '../services/appointment.service';
-import { SearchData } from '../../types/type';
-import { Appointment } from '../models/appointment.model';
 
 const appointmentController = {
   bookAppointment: async (req: ExpressRequest, res: Response) => {
@@ -14,16 +12,15 @@ const appointmentController = {
         stripUnknown: true
       });
 
-      // const validatedData = req.body;
       const calculateEndTime = (startTime: string): string => {
         const [hours, minutes] = startTime.split(':').map(Number);
         const date = new Date();
         date.setHours(hours, minutes + 30);
         return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
       };
-
+      const user_id = req.user?.id as string;
       const appointmentData: AppointmentCreateDTO = {
-        user_id: validatedData.user_id,
+        user_id: user_id,
         doctor_id: validatedData.doctor_id,
         hospital_id: validatedData.hospital_id,
         date: validatedData.date,
@@ -121,7 +118,7 @@ const appointmentController = {
   updateAppointment: async (req: ExpressRequest, res: Response): Promise<Response> => {
     try {
       const id = await idSchema.validate(req.params.id, {abortEarly: false});
-      const status = await updateAppointmentSchema.validate(req.body, {abortEarly: false });
+      const status = await appointmentStatusSchema.validate(req.body, {abortEarly: false });
       const updateAppointment = await appointmentService.updateAppointment(id, status);
       if (!updateAppointment) {
         return res.status(500).json({

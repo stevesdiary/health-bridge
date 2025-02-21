@@ -17,6 +17,10 @@ userRouter.post("/verify", async (req: ExpressRequest, res: Response) => {
   await userRegistration.verifyUser(req, res);
 });
 
+userRouter.post("/resendcode", async (req: ExpressRequest, res: Response) => {
+  await userRegistration.resendCode(req, res);
+});
+
 userRouter.get('/all', async (req: ExpressRequest, res: Response) => {
   await userController.getAllUsers(req, res)
 });

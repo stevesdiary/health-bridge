@@ -65,7 +65,7 @@ const doctorController = {
       const { email, code } = validatedData;
   
       const verificationResult = await verifyDoctor({ email, code });
-      // return
+
       return res.status(verificationResult.statusCode).json(verificationResult)
     } catch (error) {
       if (error instanceof yup.ValidationError) {
