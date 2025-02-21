@@ -1,5 +1,7 @@
 import * as amqp from 'amqplib';
 
+const QUEUE_NAME = 'appointment_notifications';
+const URL = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
 
 class RabbitMQConnection {
   private static instance: RabbitMQConnection;
@@ -15,7 +17,7 @@ class RabbitMQConnection {
     return RabbitMQConnection.instance;
   }
 
-  async connect(url: string = 'amqp://localhost') {
+  async connect(url: string = URL) {
     if (!this.connection) {
       this.connection = await amqp.connect(url);
       this.channel = await this.connection.createChannel();
@@ -37,6 +39,7 @@ class RabbitMQConnection {
     this.channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)), {
       persistent: true
     });
+    console.log(`Message sent to ${queueName}`);
   }
 
   async consume(queueName: string, callback: (msg: amqp.ConsumeMessage | null) => void) {
@@ -44,6 +47,7 @@ class RabbitMQConnection {
       throw new Error('RabbitMQ channel not initialized');
     }
     await this.channel.consume(queueName, callback, { noAck: false });
+    console.log(`Consuming messages from ${queueName}`);
   }
 }
 
