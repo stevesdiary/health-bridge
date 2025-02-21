@@ -1,11 +1,12 @@
 import RabbitMQConnection from '../../core/rabbitmq';
-
+import { Appointment } from '../appointment/models/appointment.model';
 interface NotificationMessage {
-  userId: string;
-  appointmentId: string;
+  user_id: string;
+  appointment_id: string;
   message: string;
   type: 'reminder' | 'confirmation' | 'cancellation';
   timestamp: Date;
+  date: Date;
 }
 
 class NotificationService {
@@ -29,35 +30,45 @@ class NotificationService {
     await this.rabbitMQ.createQueue(this.QUEUE_NAME);
   }
 
-  async sendAppointmentReminder(userId: string, appointmentId: string, appointmentTime: Date) {
+  async sendAppointmentReminder(user_id: string, appointment_id: string, appointmentTime: Date) {
+    const appointmentData = await Appointment.findOne({
+      where: {
+        id: appointment_id,
+        user_id: user_id
+      },
+      attributes: ['date', 'time', 'doctor_id']
+    });
     const notification: NotificationMessage = {
-      userId,
-      appointmentId,
+      user_id: user_id,
+      appointment_id,
       message: `Reminder: You have an appointment scheduled for ${appointmentTime.toLocaleString()}`,
       type: 'reminder',
-      timestamp: new Date()
+      timestamp: new Date(),
+      date: appointmentTime
     };
     await this.rabbitMQ.sendToQueue(this.QUEUE_NAME, notification);
   }
 
-  async sendAppointmentConfirmation(userId: string, appointmentId: string, appointmentTime: Date) {
+  async sendAppointmentConfirmation(user_id: string, appointment_id: string, appointmentTime: Date) {
     const notification: NotificationMessage = {
-      userId,
-      appointmentId,
+      user_id: user_id,
+      appointment_id: appointment_id,
       message: `Your appointment has been confirmed for ${appointmentTime.toLocaleString()}`,
       type: 'confirmation',
-      timestamp: new Date()
+      timestamp: new Date(),
+      date: appointmentTime
     };
     await this.rabbitMQ.sendToQueue(this.QUEUE_NAME, notification);
   }
 
-  async sendAppointmentCancellation(userId: string, appointmentId: string) {
+  async sendAppointmentCancellation(user_id: string, appointment_id: string, appointmentTime: Date) {
     const notification: NotificationMessage = {
-      userId,
-      appointmentId,
+      user_id: user_id,
+      appointment_id: appointment_id,
       message: 'Your appointment has been cancelled',
       type: 'cancellation',
-      timestamp: new Date()
+      timestamp: new Date(),
+      date: appointmentTime
     };
     await this.rabbitMQ.sendToQueue(this.QUEUE_NAME, notification);
   }
