@@ -1,4 +1,5 @@
 import { customAlphabet } from "nanoid";
+import * as yup from 'yup';
 import bcrypt from "bcrypt";
 import {Op} from 'sequelize'
 
@@ -6,6 +7,8 @@ import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
 import { User } from "../models/user.model";
 import sendEmail from "./email.service";
+import { emailSchema } from "../../../utils/validator";
+
 
 const salt = process.env.BCRYPT_SALT || 10;
 
@@ -100,3 +103,28 @@ export const verifyUser = async ({email, code}: {email: string, code: string}) =
   }
 };
 
+export const resendCode = async (emailPayload: string ) => {
+  try {
+    const email = emailPayload;
+    const nanoid = customAlphabet("1234567890", 6)();
+    const verificationCode = nanoid;
+    await saveToRedis(`verify:${email}`, verificationCode, 600);
+
+    const emailData = {
+      to: email,
+      subject: "Email Verification",
+      text: `Your verification code is ${verificationCode}`,
+    };
+    await sendEmail(emailData);
+    return {
+      statusCode: 200,
+      status: "success",
+      message: "Verification code sent to your email",
+      data: [],
+    };
+
+  } catch (error) {
+    console.log('Error ocurred', error)
+    throw error;
+  }
+};
