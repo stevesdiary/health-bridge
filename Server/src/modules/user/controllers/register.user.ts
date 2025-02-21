@@ -1,9 +1,9 @@
 import { Request as ExpressRequest, Response } from 'express';
 import * as yup from 'yup';
 
-import { verifyUser, registerUser } from '../services/user.registration';
-import { userRegistrationSchema, userVerificationSchema } from '../../../utils/validator';
-import { TypedRequest, ValidationErrorResponse } from '../../types/type';
+import { verifyUser, registerUser, resendCode } from '../services/user.registration';
+import { userRegistrationSchema, userVerificationSchema, emailSchema } from '../../../utils/validator';
+import { TypedRequest, ValidationErrorResponse,  } from '../../types/type';
 
 
 const userRegistration = {
@@ -68,6 +68,33 @@ const userRegistration = {
         status: 'error',
         message: 'Internal server error',
         error: errorMessage
+      });
+    }
+  },
+
+  resendCode: async (req: TypedRequest, res: Response): Promise<Response> => {
+    try {
+      const emailPayload = await emailSchema.validate(req.body, { abortEarly: false });
+      
+      const resend = await resendCode(emailPayload.email);
+      
+      return res.status(resend.statusCode).send({ 
+        status: 'success', 
+        message: 'Verification code resent',
+        data: resend.data
+      });
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).send({
+          status: 'error',
+          errors: error.errors
+        });
+      }
+      
+      return res.status(500).send({
+        status: 'error',
+        message: 'Internal server error',
+        details: error instanceof Error ? error.message : error
       });
     }
   }
