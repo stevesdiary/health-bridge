@@ -58,6 +58,12 @@ export class Doctor extends Model {
   phone?: string;
 
   @Column({
+    type: DataType.STRING,
+    defaultValue: 'doctor'
+  })
+  role?: string;
+
+  @Column({
     type: DataType.ENUM(...Object.values(DoctorSpecialty)),
     allowNull: false
   })
