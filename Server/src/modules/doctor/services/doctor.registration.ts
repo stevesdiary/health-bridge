@@ -23,7 +23,8 @@ export const registerDoctor = async (validatedDoctorInfo: DoctorRegistrationDTO)
       }
     }
     const hospital = await Hospital.findOne({ 
-      where: { email: validatedDoctorInfo.hospital_email }
+      where: { email: validatedDoctorInfo.hospital_email },
+      attributes: ['id']
     });
     if (!hospital) {
       throw error('Hospital record not found')
@@ -45,7 +46,7 @@ export const registerDoctor = async (validatedDoctorInfo: DoctorRegistrationDTO)
       if (doctor) {
         const nanoid = customAlphabet("1234567890", 6)();
           const verificationCode = nanoid;
-          await saveToRedis(`"verify" + ${doctor.email}`, verificationCode, 600);
+          await saveToRedis(`verify:${doctor.email}`, verificationCode, 600);
           const emailPayload = {
             to: doctor.email as string,
             subject: "Email Verification",
@@ -68,7 +69,7 @@ export const registerDoctor = async (validatedDoctorInfo: DoctorRegistrationDTO)
 
 export const verifyDoctor = async ({email, code}: {email: string, code: string}) => {
   try {
-    const verificationCode = await getFromRedis(`"verify" + ${email}`);
+    const verificationCode = await getFromRedis(`verify:${email}`);
     if (verificationCode === code) {
       await Doctor.update(
         { verified: true },
@@ -107,3 +108,72 @@ export const verifyDoctor = async ({email, code}: {email: string, code: string})
     throw error;
   }
 };
+
+export const findDoctors = async ()=> {
+  try {
+    const doctors = await Doctor.findAll();
+    if (!doctors) {
+      return {
+        statusCode: 404,
+        status: 'fail',
+        message: 'No doctor record found',
+        data: null
+      }
+    }
+    return {
+      statusCode: 200,
+      status: 'success',
+      message: 'Doctord found',
+      data: doctors
+    }
+
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const findOneDoctor = async (id: string ) => {
+  try {
+    const doctors = await Doctor.findAll();
+    if (!doctors) {
+      return {
+        statusCode: 404,
+        status: 'fail',
+        message: 'No doctor record found',
+        data: null
+      }
+    }
+    return {
+      statusCode: 200,
+      status: 'success',
+      message: 'Doctord found',
+      data: doctors
+    }
+
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const updateDoctor = async (id: string, validatedDoctorInfo: DoctorRegistrationDTO )=> {
+  try {
+    const doctor = await Doctor.findByPk(id);
+    if (!doctor) {
+      return {
+        statusCode: 404,
+        status: 'fail',
+        message: 'No doctor record found',
+        data: null
+      }
+    }
+    return {
+      statusCode: 200,
+      status: 'success',
+      message: 'Doctord record updated',
+      data: doctor
+    }
+
+  } catch (error) {
+    throw error;
+  }
+}

@@ -56,7 +56,7 @@ const userRegistration = {
       if (error instanceof yup.ValidationError) {
         return res.status(400).json({
           status: 'error',
-          message: 'Validation failerd',
+          message: 'Validation failed',
           errors: error.errors.map(errorMsg => ({
             message: errorMsg
           }))
