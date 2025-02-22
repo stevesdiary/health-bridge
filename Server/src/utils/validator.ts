@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 import { AppointmentStatus } from '../modules/types/appointment.type';
-
+import { DoctorSpecialty } from '.././modules/types/doctor.type';
 export const userRegistrationSchema = yup.object().shape({
   first_name: yup
     .string()
@@ -159,6 +159,22 @@ export const appointmentCreateSchema = yup.object().shape({
 });
 
 export const doctorRegistrationSchema = yup.object().shape({
+  first_name: yup.string()
+    .min(3, 'First name must be at least 3 characters')
+    .required('First name is required'),
+  last_name: yup.string()
+    .min(3, 'Last name must be at least 3 characters')
+    .required('Last name is required'),
+  email: yup.string()
+    .email('Invalid email format')
+    .required('Email is required'),
+  phone: yup.string().optional(),
+  specialty: yup.string()
+    .required('Specialty is required'),
+  hospital_email: yup.string()
+    .required('Hospital email is required'),
+});
+export const doctorUpdateSchema = yup.object().shape({
   first_name: yup.string()
     .min(3, 'First name must be at least 3 characters')
     .required('First name is required'),

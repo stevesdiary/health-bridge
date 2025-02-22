@@ -1,13 +1,10 @@
 import { Request as ExpressRequest, Response } from "express";
 import * as yup from 'yup';
 
-// import { doctorRegistration, verifyDoctor } from '../services/doctor.registration';
-import { doctorRegistrationSchema, userVerificationSchema } from "../../../utils/validator";
-import { abort } from "process";
-import { registerDoctor } from '../services/doctor.registration';
+import { doctorRegistrationSchema, idSchema, userVerificationSchema, doctorUpdateSchema } from "../../../utils/validator";
+import { registerDoctor, verifyDoctor, findDoctors, findOneDoctor, updateDoctor } from '../services/doctor.registration';
 import { ValidationErrorResponse, DoctorRegistrationDTO, DoctorRegistrationRequest } from '../../types/type';
 import { DoctorSpecialty } from '../model/doctor.model';
-import { verifyDoctor } from '../../doctor/services/doctor.registration';
 
 const doctorController = {
   register: async (req: DoctorRegistrationRequest, res: Response): Promise<Response> => {
@@ -71,7 +68,7 @@ const doctorController = {
       if (error instanceof yup.ValidationError) {
         return res.status(400).json({
           status: 'error',
-          message: 'Validation failerd',
+          message: 'Validation failed',
           errors: error.errors.map(errorMsg => ({
             message: errorMsg
           }))
@@ -85,10 +82,67 @@ const doctorController = {
         error: errorMessage
       });
     }
+  },
+
+  allDoctors: async (req: ExpressRequest, res: Response): Promise<Response> => {
+    try {
+      const doctors = await findDoctors();
+      return res.status(doctors.statusCode).json({
+        status: doctors.status,
+        message: doctors.message,
+        data: doctors.data
+      })
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
+    }
+  },
+
+  oneDoctor: async (req: ExpressRequest, res: Response): Promise<Response> => {
+    try {
+      const id = await idSchema.validate(req.params.id, { abortEarly: false });
+      
+      const doctor = await findOneDoctor(id);
+      return res.status(doctor.statusCode).json({
+        status: doctor.status,
+        message: doctor.message,
+        data: doctor.data
+      })
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
+    }
+  },
+
+  updateDoctor: async (req: ExpressRequest, res: Response): Promise<Response> => {
+    try {
+      const id = await idSchema.validate(req.params.id, { abortEarly: false });
+      const validatedData = await doctorUpdateSchema.validate(req.body, { abortEarly: false });
+      const doctordData = {
+        ...validatedData,
+        specialty: validatedData.specialty as DoctorSpecialty
+      };
+      const doctor = await updateDoctor(id, doctordData);
+      return res.status(doctor.statusCode).json({
+        status: doctor.status,
+        message: doctor.message,
+        data: doctor.data
+      })
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
+    }
   }
 
 }
-
-
 
 export default doctorController;

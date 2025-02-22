@@ -57,18 +57,29 @@ const appointmentService = {
         };
       }
 
+      // const [doctor, user, hospital] = await Promise.all([
+      //   Doctor.findByPk(appointmentData.doctor_id, { transaction }),
+      //   User.findByPk(appointmentData.user_id, { transaction }),
+      //   Hospital.findByPk(appointmentData.hospital_id, { transaction })
+      // ]);
       const [doctor, user, hospital] = await Promise.all([
-        Doctor.findByPk(appointmentData.doctor_id, { transaction }),
+        Doctor.findOne({ 
+          where: { email: appointmentData.doctor_email},
+          transaction
+        }),
         User.findByPk(appointmentData.user_id, { transaction }),
-        Hospital.findByPk(appointmentData.hospital_id, { transaction })
+        Hospital.findOne({ 
+          where: { email: appointmentData.hospital_email },
+          transaction
+        })
       ]);
 
-      if (!doctor) {
+      if (!doctor || !user || !hospital) {
         await transaction.rollback();
         return {
           statusCode: 404,
           status: 'fail',
-          message: 'Doctor not found',
+          message: 'Required parameters not found (Doctor,User, Hospital)',
           data: null
         };
       }

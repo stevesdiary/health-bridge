@@ -14,10 +14,10 @@ doctorRouter.post('/verify', async (req: ExpressRequest, res: Response) => {
   await doctorController.verifyDoctor(req, res);
 })
 doctorRouter.get('/all', async (req: ExpressRequest, res: Response) => {
-  await doctorController.verifyDoctor(req, res);
+  await doctorController.allDoctors(req, res);
 })
 doctorRouter.get('/one/:id', async (req: ExpressRequest, res: Response) => {
-  // await doctorController.geyOneDoctor(req, res);
+  await doctorController.oneDoctor(req, res);
 })
 doctorRouter.put('/update/:id', async (req: ExpressRequest, res: Response) => {
   await doctorController.verifyDoctor(req, res);
