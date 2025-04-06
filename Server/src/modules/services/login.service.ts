@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import cookieParser from 'cookie-parser';
 import { Response } from 'express';
-import { User } from "../../user/models/user.model";
+import { User } from "../user/user.model";
 
 const jwtExpiry = process.env.JWT_EXPIRY || '1h';
 const jwtSecret = process.env.JWT_SECRET || 'secret';
