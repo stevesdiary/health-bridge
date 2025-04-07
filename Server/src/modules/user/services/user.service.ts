@@ -1,6 +1,6 @@
 import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
-import { User } from "../models/user.model";
+import { User } from "../user.model";
 import { UserResponseData } from "../../types/type";
 
 export const getAllUsers = async (): Promise<UserResponseData> => {

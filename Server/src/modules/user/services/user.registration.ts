@@ -5,8 +5,8 @@ import {Op} from 'sequelize'
 
 import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
-import { User } from "../models/user.model";
-import sendEmail from "./email.service";
+import { User } from "../user.model";
+import sendEmail from "../../services/email.service";
 import { emailSchema } from "../../../utils/validator";
 
 
@@ -28,7 +28,9 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
       };
     }
     const hashed = await bcrypt.hash(userData.password, salt);
+    const username = userData.email.split('@')[0];
     let userCreationData = {
+      username: username,
       first_name: userData.first_name,
       last_name: userData.last_name,
       email: userData.email,
@@ -109,11 +111,11 @@ export const resendCode = async (emailPayload: string ) => {
     const nanoid = customAlphabet("1234567890", 6)();
     const verificationCode = nanoid;
     await saveToRedis(`verify:${email}`, verificationCode, 600);
-
+    const name = email.split('@')[0];
     const emailData = {
       to: email,
       subject: "Email Verification",
-      text: `Your verification code is ${verificationCode}`,
+      text: `Hi ${name}, Your verification code is ${verificationCode}`,
     };
     await sendEmail(emailData);
     return {
