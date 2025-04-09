@@ -1,4 +1,4 @@
-import appointmentService from '../appointment/services/appointment.service';
+import appointmentService from '../appointment/appointment.service';
 
 export enum AppointmentStatus {
   SCHEDULED = 'scheduled',
