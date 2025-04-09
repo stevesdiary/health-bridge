@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppointmentStatus } from './appointment.type';
-import { DoctorSpecialty } from '../doctor/model/doctor.model';
+import { DoctorSpecialty } from '../doctor/doctor.model';
 
 export interface UserAttributes {
     first_name?: string;
