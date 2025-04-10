@@ -1,4 +1,4 @@
-# care-compass
+# HealthBridge 🏥
 
 ER Diagram 
  link: https://drive.google.com/file/d/1ndBOs5qsHX70zR0v7FLuskbXd1rmTBbM/view?usp=drive_link
@@ -15,7 +15,7 @@ Dependencies
 Describe any prerequisites, libraries, OS version, etc., needed before installing program.
 ex. Windows 10
 Installing
-How/where to download your program
+A step by step series of examples that tell you how to get a development env running.
 Any modifications needed to be made to files/folders
 Executing program
 How to run the program
