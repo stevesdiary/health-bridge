@@ -191,4 +191,62 @@ export const doctorUpdateSchema = yup.object().shape({
     .required('Hospital email is required'),
 });
 
+export const paymentInitiationSchema = yup.object().shape({
+  amount: yup.number().positive().required('Amount is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  currency: yup.string().optional().default('NGN')
+});
+
+export const paymentVerificationSchema = yup.object().shape({
+  reference: yup.string().required('Payment reference is required')
+});
+
 export const appointmentStatusSchema = yup.string().required('Status is required');
+
+export const patientUpdateSchema = yup.object().shape({
+  userId: yup.number(),
+  dateOfBirth: yup.date(),
+  bloodType: yup.string()
+    .matches(/^(A|B|AB|O)[+-]$/, 'Invalid blood type format'),
+  allergies: yup.string(),
+  medicalHistory: yup.string(),
+  emergencyContactName: yup.string()
+    .min(2, 'Emergency contact name must be at least 2 characters')
+    .max(100, 'Emergency contact name must not exceed 100 characters'),
+  emergencyContactPhone: yup.string()
+    .matches(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format'),
+  insuranceProvider: yup.string()
+    .max(100, 'Insurance provider name must not exceed 100 characters'),
+  insuranceNumber: yup.string()
+    .max(50, 'Insurance number must not exceed 50 characters')
+}).noUnknown(true);
+
+export const patientSchema = yup.object().shape({
+  userId: yup.number()
+    .required('User ID is required'),
+  dateOfBirth: yup.date()
+    .required('Date of birth is required')
+    .max(new Date(), 'Date of birth cannot be in the future'),
+  bloodType: yup.string()
+    .required('Blood type is required')
+    .matches(/^(A|B|AB|O)[+-]$/, 'Invalid blood type format'),
+  allergies: yup.string()
+    .optional()
+    .nullable(),
+  medicalHistory: yup.string()
+    .optional()
+    .nullable(),
+  emergencyContactName: yup.string()
+    .required('Emergency contact name is required')
+    .min(2, 'Emergency contact name must be at least 2 characters')
+    .max(100, 'Emergency contact name must not exceed 100 characters'),
+  emergencyContactPhone: yup.string()
+    .required('Emergency contact phone is required')
+    .matches(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format'),
+  insuranceProvider: yup.string()
+    .optional()
+    .max(100, 'Insurance provider name must not exceed 100 characters'),
+  insuranceNumber: yup.string()
+    .optional()
+    .max(50, 'Insurance number must not exceed 50 characters')
+}).noUnknown(true);
