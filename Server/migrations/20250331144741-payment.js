@@ -23,6 +23,12 @@ module.exports = {
           key: 'id'
         }
       },
+      payment_method: {
+        type: Sequelize.STRING
+      },
+      payment_provider: {
+        type: Sequelize.STRING
+      },
       appointment_id: {
         type: Sequelize.UUID,
         references: {
@@ -47,15 +53,28 @@ module.exports = {
       },
       refund_amount: {
         type: Sequelize.INTEGER
+      },
+      created_at: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updated_at: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      deleted_at: {
+        type: Sequelize.DATE
       }
-  }),
-  
+    })
+  },
+
+  async down (queryInterface, Sequelize) {
     /**
      * Add reverting commands here.
      *
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('Payments')
-  },
+    await queryInterface.dropTable('doctors');
+  }
 };

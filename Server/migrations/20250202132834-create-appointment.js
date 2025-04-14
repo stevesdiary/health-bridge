@@ -9,6 +9,20 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
+
+    // First, check if the payments table exists and remove the foreign key constraint if it does
+    const paymentsTableExists = await queryInterface.describeTable('payments')
+      .then(() => true)
+      .catch(() => false);
+
+    if (paymentsTableExists) {
+      await queryInterface.removeConstraint(
+        'payments',
+        'payments_appointment_id_fkey'
+      );
+    }
+
+    // Now create the appointments table
     await queryInterface.createTable('appointments', {
       id: {
         type: Sequelize.UUID,
@@ -90,7 +104,22 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true
       }
-    })
+    });
+
+    // Add the foreign key constraint back to the payments table if it exists
+    if (paymentsTableExists) {
+      await queryInterface.addConstraint('payments', {
+        fields: ['appointment_id'],
+        type: 'foreign key',
+        name: 'payments_appointment_id_fkey',
+        references: {
+          table: 'appointments',
+          field: 'id'
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE'
+      });
+    }
   },
 
   async down (queryInterface, Sequelize) {
@@ -100,6 +129,14 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('appointments')
+
+    // First remove the foreign key constraint from the payments table
+    await queryInterface.removeConstraint(
+      'payments',
+      'payments_appointment_id_fkey'
+    );
+
+    // Then drop the appointments table
+    await queryInterface.dropTable('appointments');
   }
 };

@@ -34,15 +34,13 @@ module.exports = {
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: false
       },
       role: {
         type: Sequelize.STRING,
       },
       phone: {
         type: Sequelize.STRING,
-      },
-      date_of_birth: {
-        type: Sequelize.DATEONLY,
       },
       verified: {
         type: Sequelize.BOOLEAN,
@@ -52,13 +50,16 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: true
       },
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
       },
+      deleted_at: {
+        type: Sequelize.DATE,
+      }
     });
   },
 
