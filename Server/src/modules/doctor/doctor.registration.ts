@@ -57,7 +57,7 @@ export const registerDoctor = async (validatedDoctorInfo: DoctorRegistrationDTO)
       return {
         statusCode: 201,
         status: "success",
-        message: `Doctor ${doctor.firstName} is now registered`,
+        message: `Doctor ${doctor.first_name} is now registered`,
         data: doctorRegistrationData,
       };
     }    
