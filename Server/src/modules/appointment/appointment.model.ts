@@ -3,6 +3,17 @@ import { Hospital } from "../hospital/hospital.model";
 import { Doctor } from "../doctor/doctor.model";
 import { Patient } from "../patient/patient.model";
 
+export enum AppointmentStatus {
+  scheduled = 'scheduled',
+  completed = 'completed',
+  cancelled = 'cancelled',
+  pending = 'pending',
+  no_show = 'no_show',
+  in_progress = 'in_progress',
+  rescheduled = 'rescheduled',
+  waiting_list = 'waiting_list',
+}
+
 @Table({
   tableName: 'appointments',
   timestamps: true,
@@ -22,30 +33,30 @@ export class Appointment extends Model {
     type: DataType.UUID,
     allowNull: false
   })
-  patientId!: string;
+  patient_id!: string;
 
   @ForeignKey(() => Doctor)
   @Column({
     type: DataType.UUID,
     allowNull: false
   })
-  doctorId!: string;
+  doctor_id!: string;
 
-  @Column({
-    type: DataType.TEXT
-  })
-  reason?: string;
+  // @Column({
+  //   type: DataType.TEXT
+  // })
+  // reason?: string;
 
   @Column({
     type: DataType.BOOLEAN,
     defaultValue: false
   })
-  reminderSent!: boolean;
+  reminder_sent!: boolean;
 
   @Column({
-    type: DataType.ENUM('scheduled', 'connfirmed', 'completed', 'cancelled', 'rescheduled'),
+    type: DataType.ENUM(...Object.values(AppointmentStatus)),
     allowNull: false,
-    defaultValue: 'scheduled'
+    defaultValue: 'pending'
   })
   status!: string
 
@@ -53,7 +64,7 @@ export class Appointment extends Model {
     type: DataType.STRING,
     allowNull: true
   })
-  notes!: string;
+  notes?: string;
 
   @Column({
     type: DataType.DATEONLY,
@@ -61,44 +72,44 @@ export class Appointment extends Model {
   })
   date!: Date
 
-  @Column({
-    type: DataType.STRING
-  })
-  hospitalName!: string;
+  // @Column({
+  //   type: DataType.STRING
+  // })
+  // hospitalName!: string;
   
-  @Column({
-    type: DataType.STRING
-  })
-  specialInstruction?:string
+  // @Column({
+  //   type: DataType.STRING
+  // })
+  // specialInstruction?:string
 
-  @Column({
-    type:DataType.ENUM('virtual', 'in-person'),
-    allowNull: true
-  })
-  consultationType?: string
+  // @Column({
+  //   type:DataType.ENUM('virtual', 'in-person'),
+  //   allowNull: true
+  // })
+  // consultationType?: string
 
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  startTime!: string;
+  start_time!: string;
   
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  endTime!: string;
+  end_time!: string;
 
   @BelongsTo(() => Patient)
-  patients!: Patient;
+  patients?: Patient;
 
   @ForeignKey(() => Hospital)
   @Column({
     type: DataType.UUID,
     allowNull: false
   })
-  hospitalId!: string
+  hospital_id?: string
 
   @BelongsTo(() => Doctor)
-  doctors!: Doctor;
+  doctors?: Doctor;
 }

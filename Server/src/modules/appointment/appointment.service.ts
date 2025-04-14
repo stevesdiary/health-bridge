@@ -58,23 +58,21 @@ const appointmentService = {
       }
 
       // const [doctor, user, hospital] = await Promise.all([
-      //   Doctor.findByPk(appointmentData.doctor_id, { transaction }),
+        // Doctor.findByPk(appointmentData.doctor_id, { transaction }),
       //   User.findByPk(appointmentData.user_id, { transaction }),
       //   Hospital.findByPk(appointmentData.hospital_id, { transaction })
       // ]);
-      const [doctor, user, hospital] = await Promise.all([
-        Doctor.findOne({ 
-          where: { email: appointmentData.doctor_email},
-          transaction
-        }),
-        User.findByPk(appointmentData.user_id, { transaction }),
-        Hospital.findOne({ 
-          where: { email: appointmentData.hospital_email },
-          transaction
-        })
+      const [doctor, hospital] = await Promise.all([
+        // Doctor.findOne({ 
+        //   where: { id: appointmentData.doctor_id},
+        //   transaction
+        // }),
+        // User.findByPk(appointmentData.user_id, { transaction }),
+        Doctor.findByPk(appointmentData.doctor_id, { transaction }),
+        Hospital.findByPk(appointmentData.hospital_id, { transaction })
       ]);
 
-      if (!doctor || !user || !hospital) {
+      if (!doctor || !hospital) {
         await transaction.rollback();
         return {
           statusCode: 404,
@@ -84,31 +82,31 @@ const appointmentService = {
         };
       }
 
-      if (!user) {
-        await transaction.rollback();
-        return {
-          statusCode: 404,
-          status: 'fail',
-          message: 'User not found',
-          data: null
-        };
-      }
+      // if (!user) {
+      //   await transaction.rollback();
+      //   return {
+      //     statusCode: 404,
+      //     status: 'fail',
+      //     message: 'User not found',
+      //     data: null
+      //   };
+      // }
 
-      if (!hospital) {
-        await transaction.rollback();
-        return {
-          statusCode: 404,
-          status: 'fail',
-          message: 'Hospital not found',
-          data: null
-        };
-      }
+      // if (!hospital) {
+      //   await transaction.rollback();
+      //   return {
+      //     statusCode: 404,
+      //     status: 'fail',
+      //     message: 'Hospital not found',
+      //     data: null
+      //   };
+      // }
 
       // Create appointment
       const appointment = await Appointment.create(
         {
           ...appointmentData,
-          status: AppointmentStatus.SCHEDULED
+          status: AppointmentStatus.pending
         },
         { transaction }
       );
@@ -122,7 +120,7 @@ const appointmentService = {
         data: {
           id: appointment.id,
           ...appointmentData,
-          status: AppointmentStatus.SCHEDULED
+          status: AppointmentStatus.pending
         }
       };
     } catch (error) {
@@ -141,7 +139,7 @@ const appointmentService = {
   getAppointments: async (SearchData: SearchData) => {
     try {
       const appointments = await Appointment.findAll();
-      if (! appointmentService || appointments.length === 0) {
+      if (!appointments || appointments.length === 0) {
         return {
           statusCode: 404,
           status: 'fail',

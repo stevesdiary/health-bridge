@@ -6,21 +6,28 @@ import authentication from '../../middlewares/authentication';
 
 const appointmentRouter = Router();
 
-appointmentRouter.post('/create', 
-  // authentication, checkRole(['user', 'admin']), 
+appointmentRouter.post('/book', 
+  authentication,
+  // checkRole(['user', 'admin']), 
   async (req: ExpressRequest, res: Response) => {
   await appointmentController.bookAppointment(req, res);
 })
 
-appointmentRouter.get('/all', authentication, checkRole(['user', 'admin']), async (req: ExpressRequest, res: Response) => {
+appointmentRouter.get('/all', 
+  // authentication, checkRole(['user', 'admin']), 
+async (req: ExpressRequest, res: Response) => {
   await appointmentController.getAppointments(req, res);
 })
 
-appointmentRouter.get('/one', authentication, checkRole(['user', 'admin']), async (req: ExpressRequest, res: Response) => {
+appointmentRouter.get('/one', 
+  // authentication, checkRole(['user', 'admin']), 
+  async (req: ExpressRequest, res: Response) => {
   await appointmentController.getOneAppointmentRecord(req, res);
 })
 
-appointmentRouter.put('/update/:id', authentication, checkRole(['user', 'admin']), async (req: ExpressRequest, res: Response) => {
+appointmentRouter.put('/update/:id', 
+  // authentication, checkRole(['user', 'admin']), 
+  async (req: ExpressRequest, res: Response) => {
   await appointmentController.updateAppointment(req, res);
 })
 

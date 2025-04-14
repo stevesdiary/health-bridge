@@ -1,4 +1,5 @@
 import yup from 'yup';
+import dayjs from 'dayjs';
 import { Response, Request as ExpressRequest } from 'express';
 import { appointmentCreateSchema, idSchema, searchSchema, appointmentStatusSchema } from '../../utils/validator';
 import { AppointmentCreateDTO } from '../types/appointment.type';
@@ -7,45 +8,65 @@ import appointmentService from './appointment.service';
 const appointmentController = {
   bookAppointment: async (req: ExpressRequest, res: Response) => {
     try {
+      const user =  req.user;
+      if (!user) {
+        return res.status(401).json({
+          status: 'error',
+          message: 'User not authenticated',
+          data: null
+        });
+      }
+
       const validatedData = await appointmentCreateSchema.validate(req.body, {
         abortEarly: false,
         stripUnknown: true
       });
+      // let endTime = { end_time: validatedData.end_time };
+      let time = { start_time: validatedData.start_time };
 
-      const calculateEndTime = (startTime: string): string => {
-        const [hours, minutes] = startTime.split(':').map(Number);
-        const date = new Date();
-        date.setHours(hours, minutes + 30);
-        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-      };
-      const user_id = req.user?.id as string;
+      let [hour, minute] = time.start_time.split(':').map(Number);
+      let start_time = dayjs().hour(hour).minute(minute).second(0);
+      let formattedStartTime = start_time.format('h:mm A');
+      let end_time = start_time.add(1, 'hour');
+      let formattedEndTime = end_time.format('h:mm A');
+
       const appointmentData: AppointmentCreateDTO = {
-        user_id: user_id,
+        user_id: user.id,
         doctor_id: validatedData.doctor_id,
+        patient_id: user.id,
         hospital_id: validatedData.hospital_id,
         date: validatedData.date,
-        start_time: validatedData.start_time,
-        end_time: validatedData.end_time || calculateEndTime(validatedData.start_time),
+        start_time: formattedStartTime,
+        end_time: formattedEndTime,
         notes: validatedData.notes || ''
       };
   
       const result = await appointmentService.createAppointment(appointmentData);
+      
+      if (!result) {
+        return res.status(500).json({
+          status: 'error',
+          message: 'Failed to create appointment',
+          data: null
+        });
+      }
+
       return res.status(result.statusCode).json({
         status: result.status,
         message: result.message,
         data: result.data
       });
     } catch (error) {
-      if (error instanceof yup.ValidationError) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Validation failed',
-          errors: error.inner.map(err => ({
-            field: err.path || 'unknown',
-            message: err.message
-          }))
-        });
-      }
+      // if (error instanceof yup.ValidationError) {
+      //   return res.status(400).json({
+      //     status: 'error',
+      //     message: 'Validation failed',
+      //     errors: error.inner.map(err => ({
+      //       field: err.path || 'unknown',
+      //       message: err.message
+      //     }))
+      //   });
+      // }
   
       console.error('Appointment Creation Error:', error);
       return res.status(500).json({
