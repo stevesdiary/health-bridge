@@ -3,20 +3,25 @@ import {
   Column, 
   Model, 
   DataType, 
-  HasMany
+  HasMany,
+  HasOne
 } from 'sequelize-typescript';
 import { Appointment } from '../appointment/appointment.model';
+import { Patient } from '../patient/patient.model';
 
 export enum UserRole {
   PATIENT = 'PATIENT',
   ADMIN = 'ADMIN',
   STAFF = 'STAFF',
-  MODERATOR = 'MODERATOR'
+  DOCTOR = 'DOCTOR'
 }
 
 @Table({
   tableName: 'users',
-  timestamps: true
+  timestamps: true,
+  underscored: true,
+  paranoid: true,
+  freezeTableName: true,
 })
 export class User extends Model {
   @Column({
@@ -24,26 +29,26 @@ export class User extends Model {
     defaultValue: DataType.UUIDV4,
     primaryKey: true
   })
-  id?: string;
+  id!: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  firstName?: string;
+  first_name!: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  lastName?: string;
+  last_name!: string;
 
   @Column({
     type: DataType.STRING,
     unique: true,
     allowNull: false
   })
-  email?: string;
+  email!: string;
 
   @Column({
     type: DataType.STRING,
@@ -55,7 +60,7 @@ export class User extends Model {
     type: DataType.STRING,
     allowNull: false
   })
-  password?: string;
+  password!: string;
 
   @Column({
     type: DataType.ENUM(...Object.values(UserRole)),
@@ -69,21 +74,19 @@ export class User extends Model {
   phone?: string;
 
   @Column({
-    type: DataType.DATE
-  })
-  dateOfBirth?: Date;
-
-  @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: false
   })
-  verified?: boolean;
+  verified!: boolean;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: true
   })
-  isActive?: boolean;
+  is_active!: boolean;
+
+  @HasOne(() => Patient)
+  patient?: Patient;
 }
