@@ -5,20 +5,18 @@ import { checkRole } from '../../middlewares/authorisation';
 
 const patientRouter = express.Router();
 
-// Patient registration route
 patientRouter.post(
   '/register',
   authentication,
-  checkRole(['patient']),
+  checkRole(['PATIENT', 'ADMIN']),
   async (req: ExpressRequest, res: Response) => {
     patientController.registerPatient(req, res);
   }
 );
 
-// Get all patients with search and pagination
 patientRouter.get(
-  '/',
-  authentication,
+  '/all',
+  // authentication,
   async (req: ExpressRequest, res: Response) => {
     patientController.getPatients(req, res);
   }
@@ -27,8 +25,7 @@ patientRouter.get(
 //   await hospitalController.registerHospital(req, res);
 // });
 // Get single patient by ID
-patientRouter.get(
-  '/:id',
+patientRouter.get('/one/:id',
   authentication,
   async (req: ExpressRequest, res: Response) => {
     await patientController.getOnePatient(req, res);
@@ -36,10 +33,9 @@ patientRouter.get(
 );
 
 // Update patient information
-patientRouter.put(
-  '/:id',
+patientRouter.put('/update/:id',
   authentication,
-  checkRole(['patient']),
+  checkRole(['patient', 'admin']),
   async (req: ExpressRequest, res: Response) => {
     patientController.updatePatient(req, res);
   }
