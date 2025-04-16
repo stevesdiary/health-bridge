@@ -7,6 +7,7 @@ import { AppointmentCreateDTO, AppointmentStatus, AppointmentResponse } from '..
 import { Doctor } from '../doctor/doctor.model';
 import { ApiResponse, SearchData } from '../types/type';
 import sequelize from '../../core/database';
+import { Patient } from '../patient/patient.model';
 
 
 
@@ -62,17 +63,30 @@ const appointmentService = {
       //   User.findByPk(appointmentData.user_id, { transaction }),
       //   Hospital.findByPk(appointmentData.hospital_id, { transaction })
       // ]);
-      const [doctor, hospital] = await Promise.all([
+      const [doctor, user, hospital] = await Promise.all([
         // Doctor.findOne({ 
-        //   where: { id: appointmentData.doctor_id},
+        //   where: { email: appointmentData.doctor_email},
         //   transaction
         // }),
-        // User.findByPk(appointmentData.user_id, { transaction }),
         Doctor.findByPk(appointmentData.doctor_id, { transaction }),
+        User.findByPk(appointmentData.user_id,{
+          attributes: {
+            include: ['id']
+          },
+          include: [
+            {
+              model: Patient,
+              as: "patient",
+              attributes: {
+                include: ['id']
+              },
+            }
+          ],
+        transaction }),
         Hospital.findByPk(appointmentData.hospital_id, { transaction })
       ]);
 
-      if (!doctor || !hospital) {
+      if (!doctor || !user || !hospital) {
         await transaction.rollback();
         return {
           statusCode: 404,
@@ -81,16 +95,16 @@ const appointmentService = {
           data: null
         };
       }
-
-      // if (!user) {
-      //   await transaction.rollback();
-      //   return {
-      //     statusCode: 404,
-      //     status: 'fail',
-      //     message: 'User not found',
-      //     data: null
-      //   };
-      // }
+      console.log('User with patient id', user?.dataValues.patient?.id);
+      if (!user) {
+        await transaction.rollback();
+        return {
+          statusCode: 404,
+          status: 'fail',
+          message: 'User not found',
+          data: null
+        };
+      }
 
       // if (!hospital) {
       //   await transaction.rollback();
@@ -106,6 +120,7 @@ const appointmentService = {
       const appointment = await Appointment.create(
         {
           ...appointmentData,
+          patient_id: user?.dataValues.patient?.id,
           status: AppointmentStatus.pending
         },
         { transaction }
@@ -119,6 +134,7 @@ const appointmentService = {
         message: 'Appointment created successfully',
         data: {
           id: appointment.id,
+          patient_id: appointment.patient_id,
           ...appointmentData,
           status: AppointmentStatus.pending
         }
@@ -138,7 +154,32 @@ const appointmentService = {
 
   getAppointments: async (SearchData: SearchData) => {
     try {
-      const appointments = await Appointment.findAll();
+      const appointments = await Appointment.findAll({
+        include: [
+          {
+            model: Patient,
+            as: 'patient',
+            attributes: ['id'],
+            include: [
+              {
+                model: User,
+                as: 'user',
+                attributes: ['id', 'first_name', 'last_name', 'email'],
+              },
+            ],
+          },
+          {
+            model: Doctor,
+            as: 'doctor',
+            attributes: ['id', 'first_name', 'last_name', 'email', 'specialty'],
+          },
+          {
+            model: Hospital,
+            as: 'hospital',
+            attributes: ['id', 'name', 'address'],
+          }
+        ]
+      });
       if (!appointments || appointments.length === 0) {
         return {
           statusCode: 404,

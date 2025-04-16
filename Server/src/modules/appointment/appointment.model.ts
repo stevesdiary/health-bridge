@@ -101,7 +101,7 @@ export class Appointment extends Model {
   end_time!: string;
 
   @BelongsTo(() => Patient)
-  patients?: Patient;
+  patient?: Patient;
 
   @ForeignKey(() => Hospital)
   @Column({
@@ -110,6 +110,9 @@ export class Appointment extends Model {
   })
   hospital_id?: string
 
+  @BelongsTo(() => Hospital)
+  hospital?: Hospital;
+  
   @BelongsTo(() => Doctor)
-  doctors?: Doctor;
+  doctor?: Doctor;
 }

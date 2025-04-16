@@ -33,7 +33,7 @@ const appointmentController = {
       const appointmentData: AppointmentCreateDTO = {
         user_id: user.id,
         doctor_id: validatedData.doctor_id,
-        patient_id: user.id,
+        // patient_id: user.id,
         hospital_id: validatedData.hospital_id,
         date: validatedData.date,
         start_time: formattedStartTime,
@@ -102,29 +102,27 @@ const appointmentController = {
     }
   },
 
-  getOneAppointmentRecord: async (req: ExpressRequest, res: Response) => {
+  getOneAppointmentRecord: async (req: ExpressRequest, res: Response): Promise<Response> => {
     try {
       const id = await idSchema.validate(req.params.id, {abortEarly: false});
-      const getOneRecord = await appointmentService.getOneAppointmentRecord(id);
-      if (!getOneRecord) {
-        return res.status(404).json({
-          status: 'fail',
-          message: 'Appointment not found',
-          data: null
-        });
-      }
-      return {
-        statusCode: getOneRecord.statusCode,
-        status: getOneRecord.status,
-        message: getOneRecord.message,
-        data: getOneRecord.data
-      }
-    } catch (error) {
-      if (error instanceof yup.ValidationError) {
+      if (!id) {
         return res.status(400).json({
           status: 'error',
-          message: 'Validation failed',
-          errors: error.errors
+          message: 'Validation failed, Id is required',
+          errors: 'Invalid ID'
+        });
+      }
+      const appointment = await appointmentService.getOneAppointmentRecord(id);
+      
+      return res.status(appointment?.statusCode || 500).send({
+        status: (appointment?.status),
+        message: appointment?.message,
+        data: appointment?.data
+      })
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).send({
+          error: error
         });
       }
       

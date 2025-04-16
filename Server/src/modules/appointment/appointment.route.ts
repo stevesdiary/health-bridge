@@ -19,7 +19,7 @@ async (req: ExpressRequest, res: Response) => {
   await appointmentController.getAppointments(req, res);
 })
 
-appointmentRouter.get('/one', 
+appointmentRouter.get('/one/:id', 
   // authentication, checkRole(['user', 'admin']), 
   async (req: ExpressRequest, res: Response) => {
   await appointmentController.getOneAppointmentRecord(req, res);
