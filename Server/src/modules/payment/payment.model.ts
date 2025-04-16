@@ -15,6 +15,7 @@ import { Patient } from '../patient/patient.model';
 
 type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
 type PaymentMethod = 'credit_card' | 'debit_card' | 'bank_transfer' | 'cash' | 'POS';
+type Currency = 'NGN' | 'USD' | 'EUR' | 'GBP';
 
 @Table({
   tableName: 'payments',
@@ -63,7 +64,7 @@ export class Payment extends Model {
     allowNull: false,
     defaultValue: 'NGN',
   })
-  currency!: string;
+  currency!: Currency;
 
   @Column({
     type: DataType.ENUM('pending', 'completed', 'failed', 'refunded'),
@@ -71,15 +72,21 @@ export class Payment extends Model {
     defaultValue: 'pending',
   })
   paymentStatus!: PaymentStatus;
+  
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  paymentProvider!: string;
 
   @Column({
-    type: DataType.ENUM('credit_card', 'debit_card', 'bank_transfer', 'cash', 'POS'),
+    type: DataType.ENUM('credit_card', 'debit_card', 'bank_transfer', 'cash', 'USSD', 'paypal'),
     allowNull: false,
   })
   paymentMethod!: PaymentMethod;
 
-  @Column(DataType.STRING)
-  transactionId?: string;
+  // @Column(DataType.STRING)
+  // transactionId?: string;
 
   @Column({
     type: DataType.DATE,
@@ -88,13 +95,13 @@ export class Payment extends Model {
   })
   paymentDate!: Date;
 
-  @Column({
-    type: DataType.DECIMAL(10, 2),
-  })
-  refundAmount?: number;
+  // @Column({
+  //   type: DataType.DECIMAL(10, 2),
+  // })
+  // refundAmount?: number;
 
-  @Column(DataType.DATE)
-  refundDate?: Date;
+  // @Column(DataType.DATE)
+  // refundDate?: Date;
 
   @CreatedAt
   createdAt!: Date;

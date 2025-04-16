@@ -14,4 +14,14 @@ paymentRouter.get("/verify/:reference", async (req: ExpressRequest, res: Respons
   await paymentController.verifyPayment(req, res);
 });
 
+paymentRouter.get("/all", 
+  async (req: ExpressRequest, res: Response) => {
+  await paymentController.getAllPayments(req, res);
+});
+
+paymentRouter.get("/:paymentId",
+  async (req: ExpressRequest, res: Response) => {
+  await paymentController.getPaymentById(req, res);
+});
+
 export default paymentRouter;
