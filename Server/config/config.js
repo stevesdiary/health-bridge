@@ -1,26 +1,33 @@
-const dotenv = require('dotenv');
-const fs = require('fs');
+require('dotenv').config();
 
-dotenv.config();
+const config = {
+  development: {
+    dialect: 'postgres',
+    dialectModule: require('pg'),
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    ssl: true,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+      sslmode: 'require'
+    },
+    seederStorage: 'sequelize',
+    seederStorageTableName: 'seeders',
+    migrationStorage: 'sequelize',
+    migrationStorageTableName: 'migrations'
+  },
+  test: {
+    // same configuration as development
+  },
+  production: {
+    // same configuration as development
+  }
+};
 
-const databaseConnection = {
-  dialect: 'postgres',
-  seedersStorage: 'sequelize',
-  seedersStorageTableName: 'seeders',
-  migrationStorageTableName: 'migrations',
-  host: process.env.DB_HOST,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  // ssl: {
-  //   rejectUnauthorized: false,
-  //   ca: process.env.DB_SSL_CA,
-  // },
-}
-
-module.exports = {
-  test: databaseConnection,
-  development: databaseConnection,
-  production: databaseConnection
-}
+module.exports = config;
