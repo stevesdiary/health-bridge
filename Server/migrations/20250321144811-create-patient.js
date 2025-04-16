@@ -35,15 +35,19 @@ module.exports = {
         references: {
           model: 'users',
           key: 'id'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      date_of_birth: {
-        type: Sequelize.DATEONLY,
-        allowNull: false
-      },
-      blood_type: {
+      email: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      date_of_birth: {
+        type: Sequelize.DATEONLY
+      },
+      blood_type: {
+        type: Sequelize.STRING
       },
       allergies: {
         type: Sequelize.STRING,
@@ -78,19 +82,19 @@ module.exports = {
     });
 
     // Add the foreign key constraint back to the payments table if it exists
-    if (paymentsTableExists) {
-      await queryInterface.addConstraint('payments', {
-        fields: ['patient_id'],
-        type: 'foreign key',
-        name: 'payments_patient_id_fkey',
-        references: {
-          table: 'patients',
-          field: 'id'
-        },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
-      });
-    }
+    // if (paymentsTableExists) {
+    //   await queryInterface.addConstraint('payments', {
+    //     fields: ['patient_id'],
+    //     type: 'foreign key',
+    //     name: 'payments_patient_id_fkey',
+    //     references: {
+    //       table: 'patients',
+    //       field: 'id'
+    //     },
+    //     onDelete: 'SET NULL',
+    //     onUpdate: 'CASCADE'
+    //   });
+    // }
   },
 
   async down (queryInterface, Sequelize) {

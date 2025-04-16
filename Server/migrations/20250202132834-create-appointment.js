@@ -30,21 +30,19 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4
       },
-      user_id: {
+      patient_id: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'users',
+          model: 'patients',
           key: 'id'
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        // onUpdate: 'CASCADE',
+        // onDelete: 'CASCADE'
       },
       status: {
-        type: Sequelize.ENUM('completed', 'scheduled', 'cancelled'),
-        allowNull: false,
-        defaultValue: 'scheduled',
-        comment: 'Current appointment state'
+        type: Sequelize.STRING,
+        allowNull: false
       },
       reminder_sent: {
         type: Sequelize.BOOLEAN,
