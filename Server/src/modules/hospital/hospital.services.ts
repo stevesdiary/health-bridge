@@ -3,11 +3,16 @@ import { Hospital } from './hospital.model';
 import { getFromRedis, saveToRedis } from '../../core/redis';
 import { SearchData } from '../types/type';
 
-export const getHospitals = async (searchData: SearchData) => {
+export const getHospitals = async (searchData?: SearchData) => {
   try {
-    const key = 'fetch:allHospitals';
-
+    const search = searchData?.search || '';
+    const page = searchData?.page || 1; 
+    const limit = searchData?.limit || 10;
+    const offset = (page - 1) * limit;
+    
+    const key = `fetch:hospitals:${search}:${page}:${limit}`;
     let fetchHospitals: string | null = await getFromRedis(key);
+    
     if (fetchHospitals) {
       return {
         statusCode: 200,
@@ -16,20 +21,22 @@ export const getHospitals = async (searchData: SearchData) => {
         data: JSON.parse(fetchHospitals),
       };
     }
-    const searchTerm = searchData.search || '';
-    const searchPattern = `%${searchTerm}%`;
-    const hospitals = await Hospital.findAll({
+
+    const searchPattern = `%${search}%`;
+    const hospitals = await Hospital.findAndCountAll({
       where: {
         [Operators.or]: [
           { name: { [Operators.iLike]: searchPattern } },
           { city: { [Operators.iLike]: searchPattern } },
           { state: { [Operators.iLike]: searchPattern } },
-          // { specialization: { [Operators.iLike]: searchPattern } },
         ]
-      }
+      },
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']]
     });
 
-    if (!hospitals || hospitals.length === 0) {
+    if (!hospitals || hospitals.count === 0) {
       return {
         statusCode: 404,
         status: 'fail',
@@ -38,17 +45,29 @@ export const getHospitals = async (searchData: SearchData) => {
       };
     }
 
-    await saveToRedis(key, JSON.stringify(hospitals), 2000);
+    const response = {
+      total: hospitals.count,
+      currentPage: page,
+      totalPages: Math.ceil(hospitals.count / limit),
+      hospitals: hospitals.rows
+    };
+
+    await saveToRedis(key, JSON.stringify(response), 2000);
 
     return {
       statusCode: 200,
       status: 'success',
       message: 'Hospitals fetched from database',
-      data: hospitals,
+      data: response,
     };
   } catch (error) {
     console.error('Error in getHospitals service:', error);
-    throw new Error('Failed to fetch hospitals');
+    return {
+      statusCode: 500,
+      status: 'error',
+      message: 'Failed to fetch hospitals',
+      data: null
+    };
   }
 };
 
