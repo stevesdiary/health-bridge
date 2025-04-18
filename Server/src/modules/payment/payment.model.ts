@@ -38,7 +38,7 @@ export class Payment extends Model {
     type: DataType.UUID,
     allowNull: false,
   })
-  patientId!: string;
+  patient_id!: string;
 
   @BelongsTo(() => Patient)
   patient?: Patient;
@@ -48,7 +48,7 @@ export class Payment extends Model {
     type: DataType.UUID,
     allowNull: false
   })
-  appointmentId!: number;
+  appointment_id!: number;
 
   @BelongsTo(() => Appointment)
   appointment?: Appointment;
@@ -71,37 +71,39 @@ export class Payment extends Model {
     allowNull: false,
     defaultValue: 'pending',
   })
-  paymentStatus!: PaymentStatus;
+  payment_status!: PaymentStatus;
   
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  paymentProvider!: string;
+  payment_provider!: string;
 
   @Column({
     type: DataType.ENUM('credit_card', 'debit_card', 'bank_transfer', 'cash', 'USSD', 'paypal'),
     allowNull: false,
   })
-  paymentMethod!: PaymentMethod;
+  payment_method!: PaymentMethod;
 
-  // @Column(DataType.STRING)
-  // transactionId?: string;
+  @Column({
+    type: DataType.STRING
+  })
+  reference!: string;
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
     defaultValue: DataType.NOW,
   })
-  paymentDate!: Date;
+  payment_date!: Date;
 
-  // @Column({
-  //   type: DataType.DECIMAL(10, 2),
-  // })
-  // refundAmount?: number;
+  @Column({
+    type: DataType.DECIMAL(10, 2),
+  })
+  refund_amount?: number;
 
-  // @Column(DataType.DATE)
-  // refundDate?: Date;
+  @Column(DataType.DATE)
+  refund_date?: Date;
 
   @CreatedAt
   createdAt!: Date;

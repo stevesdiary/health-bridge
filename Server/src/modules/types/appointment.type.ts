@@ -1,9 +1,14 @@
-import appointmentService from '../appointment/appointment.service';
+// import { AppointmentStatus } from "../appointment/appointment.model";
 
 export enum AppointmentStatus {
-  SCHEDULED = 'scheduled',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled'
+  scheduled = 'scheduled',
+  completed = 'completed',
+  cancelled = 'cancelled',
+  pending = 'pending',
+  no_show = 'no_show',
+  in_progress = 'in_progress',
+  rescheduled = 'rescheduled',
+  waiting_list = 'waiting_list',
 }
 
 type Identifier = string;
@@ -12,9 +17,9 @@ export interface AppointmentCreateDTO {
   user_id: string;
   doctor_id: string;
   hospital_id: string;
-  date: string; // ISO date string
-  start_time: string; // HH:MM format
-  end_time: string; // HH:MM format
+  date: string;
+  start_time: string;
+  end_time: string;
   notes: string;
   status?: AppointmentStatus;
 }
@@ -25,6 +30,7 @@ export interface AppointmentResponse {
   id: string;
   user_id: string;
   hospital_id: string;
+  patient_id: string;
   doctor_id: string;
   date: string;
   start_time: string;
