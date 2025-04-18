@@ -6,10 +6,14 @@ import {
   HasMany 
 } from 'sequelize-typescript';
 import { Doctor } from '../doctor/doctor.model';
+import { Appointment } from '../appointment/appointment.model';
 
 @Table({
   tableName: 'hospitals',
-  timestamps: true
+  timestamps: true,
+  underscored: true,
+  paranoid: true,
+  freezeTableName: true,
 })
 export class Hospital extends Model {
   @Column({
@@ -76,4 +80,24 @@ export class Hospital extends Model {
   // Relationships
   @HasMany(() => Doctor)
   doctors?: Doctor[];
+
+  @HasMany(() => Appointment)
+  appointments?: Appointment[];
+
+  @Column({
+    type: DataType.DATE,
+    defaultValue: DataType.NOW
+  })
+  created_at?: Date;
+
+  @Column({
+    type: DataType.DATE,
+    defaultValue: DataType.NOW
+  })
+  updated_at?: Date;
+  
+  @Column({
+    type: DataType.DATE
+  })
+  deleted_at?: Date;
 }
