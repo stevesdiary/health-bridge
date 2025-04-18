@@ -51,6 +51,14 @@ module.exports = {
       amount: {
         type: Sequelize.INTEGER
       },
+      reference: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+      },
+      refund_date: {
+        type: Sequelize.DATE
+      },
       refund_amount: {
         type: Sequelize.INTEGER
       },
