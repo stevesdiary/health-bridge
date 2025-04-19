@@ -141,9 +141,9 @@ export const searchSchema = yup.object({
 });
 
 export const appointmentCreateSchema = yup.object().shape({
-  patient_id: yup.string()
-    .transform((value) => value?.replace(/^"|"$/g, ''))
-    .required('Patient ID is required'),
+  // patient_id: yup.string()
+  //   .transform((value) => value?.replace(/^"|"$/g, ''))
+  //   .required('Patient ID is required'),
   doctor_id: yup.string()
     .transform((value) => value?.replace(/^"|"$/g, ''))
     .required('Doctor ID is required'),
