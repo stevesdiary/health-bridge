@@ -15,7 +15,7 @@ export enum DoctorSpecialty {
   CARDIOLOGY = 'CARDIOLOGY',
   PEDIATRICS = 'PEDIATRICS',
   NEUROLOGY = 'NEUROLOGY',
-  SURGEON = 'SURGRON',
+  SURGEON = 'SURGEON',
   DENTIST = 'DENTISTRY',
   DERMATOLOGY = 'DERMATOLOGY',
   OBSTETRICS_AND_GYNECOLOGY = 'OBSTETRICS_AND_GYNECOLOGY',
@@ -46,7 +46,7 @@ export class Doctor extends Model {
     type: DataType.STRING,
     allowNull: false
   })
-  firstName?: string;
+  first_name!: string;
 
   @Column({
     type: DataType.STRING,
@@ -89,7 +89,7 @@ export class Doctor extends Model {
     type: DataType.UUID,
     allowNull: false
   })
-  hospitalId?: string;
+  hospital_id?: string;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -97,11 +97,11 @@ export class Doctor extends Model {
   })
   available?: boolean;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false
-  })
-  lisenceNumber!: string;
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: false
+  // })
+  // lisenceNumber!: string;
 
   @BelongsTo(() => Hospital)
   hospitals?: Hospital;
