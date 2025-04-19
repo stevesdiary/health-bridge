@@ -4,8 +4,6 @@ const paymentRouter = express.Router();
 import { Router, Request as ExpressRequest, Response } from 'express';
 import paymentController from '../payment/payment.controller';
 
-// const paymentRouter = Router();
-
 paymentRouter.post("/initiate", async (req: ExpressRequest, res: Response) => {
   await paymentController.initiatePayment(req, res);
 });
@@ -19,9 +17,14 @@ paymentRouter.get("/all",
   await paymentController.getAllPayments(req, res);
 });
 
-paymentRouter.get("/:paymentId",
+paymentRouter.get("/id/:paymentId",
   async (req: ExpressRequest, res: Response) => {
   await paymentController.getPaymentById(req, res);
+});
+
+paymentRouter.get("/ref/:reference",
+  async (req: ExpressRequest, res: Response) => {
+  await paymentController.getPaymentByReference(req, res);
 });
 
 export default paymentRouter;

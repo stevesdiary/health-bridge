@@ -130,7 +130,34 @@ const paymentController = {
         error: error instanceof Error? error.message : 'Unknown error'
       })
     }
-  } 
+  },
+  getPaymentByReference: async (req: ExpressRequest, res: Response) => {
+    try {
+      const { reference } = req.params;
+      if (!reference) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Missing reference parameter',
+          error: 'Invalid request'
+        });
+      }
+      const payment = await paymentService.getPaymentByReference(reference);
+      return res.status(payment.statusCode).json({
+        status: payment.status,
+        message: payment.message,
+        data: payment.data
+      });
+    } catch (error: any) {
+      console.log(error);
+      const statusCode = error.statusCode || 500;
+      return res.status(500).json({
+        status: 'error',
+        message: error.message || 'Internal server error',
+        error: error instanceof Error? error.message : 'Unknown error'
+      })
+    }
+  },
+  
 };
 
 export default paymentController;

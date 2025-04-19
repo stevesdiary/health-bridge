@@ -8,7 +8,7 @@ import {
   FetchPaymentsRequestData
 } from '../types/payment.types';
 import { getFromRedis, saveToRedis } from '../../core/redis';
-import { customAlphabet } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 import { Payment } from './payment.model';
 import { Patient } from '../patient/patient.model';
 import { Appointment } from '../appointment/appointment.model';
@@ -18,7 +18,7 @@ export const paymentService = {
   initiatePayment: async (paymentData: PaymentRequestData): Promise<PaymentResponse> => {
     try {
       const { amount, email, currency, payment_provider, payment_method } = paymentData;
-      // console.log("PAYMENT DATA", paymentData); 
+      
       if (!paymentData) {
         return {
           statusCode: 400,
@@ -44,7 +44,7 @@ export const paymentService = {
           }
         ]
       });
-      console.log("PATIENT DATA FROM USER", paymentData.email, user?.dataValues.patient.id);
+
       if (!user) {
         return {
           statusCode: 404,
@@ -72,24 +72,24 @@ export const paymentService = {
       }
   
       const paymentInitData: PaymentInitiationData = {
-        amount: paymentData.amount,
-        email: paymentData.email,
-        currency: paymentData.currency,
-        paymentProvider: paymentData.payment_provider || 'paystack',
-        paymentMethod: paymentData.payment_method,
+        amount: amount,
+        email: email,
+        currency: currency,
+        paymentProvider: payment_provider || 'paystack',
+        paymentMethod: payment_method,
         patient_id: user?.dataValues.patient.id,
         appointment_id: appointment.id
       };
       console.log("PAYMENT INNITIATION DATA" ,paymentInitData)
   
       const cacheKey = `payment:initiate:${paymentInitData.email}`;
-      const nanoid = customAlphabet("1234567890");
-      const generatePaystackReference = nanoid(10);
+      // const nanoid = customAlphabet("1234567890");
+      const generatePaystackReference = uuidv4();
       
       const params = {
-        amount: paymentData.amount * 100, // Convert to kobo
-        email: paymentData.email,
-        currency: paymentData.currency || 'NGN',
+        amount: amount * 100, // Convert to kobo
+        email: email,
+        currency: currency || 'NGN',
         reference: generatePaystackReference,
         callback_url: `${process.env.PAYSTACK_CALLBACK_URL}`
       };
@@ -220,6 +220,33 @@ export const paymentService = {
   getPaymentById: async (paymentId: string): Promise<AllPaymentsResponse> => {
     try {
       const payment = await Payment.findByPk(paymentId);
+      if (!payment) {
+        return {
+          statusCode: 404,
+          status: 'error',
+          message: 'Payment not found',
+          data: null
+        };
+      }
+      return {
+        statusCode: 200,
+        status: 'success',
+        message: 'Payment retrieved successfully',
+        data: payment 
+      }
+    }
+    catch (error) {
+      console.log(error);
+      throw error;
+    }
+  },
+  getPaymentByReference: async (reference: string): Promise<AllPaymentsResponse> => {
+    try {
+      const payment = await Payment.findOne({
+        where: {
+          reference: reference
+        }
+      });
       if (!payment) {
         return {
           statusCode: 404,
