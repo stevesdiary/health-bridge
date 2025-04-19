@@ -22,7 +22,8 @@ const sequelize = new Sequelize({
     ssl: {
       require: true,
       rejectUnauthorized: false
-    }
+    },
+    connectionTimeout: 30000
   },
   pool: {
     max: 5,
