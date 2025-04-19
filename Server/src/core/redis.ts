@@ -118,4 +118,4 @@ initializeRedisConnection().catch(err => {
   process.exit(1);
 });
 
-export { getFromRedis, saveToRedis };
+export { getFromRedis, saveToRedis, initializeRedisConnection };

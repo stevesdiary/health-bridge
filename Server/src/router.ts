@@ -1,11 +1,13 @@
 import express, { Router } from "express";
 
-import userRouter from "./modules/user/routes/user.route";
-import loginRouter from "./modules/user/routes/login.route";
-import hospitalRouter from "./modules/hospital/routes/hospital.route";
-import appointmentRouter from "./modules/appointment/routes/appointment.route";
-import doctorRouter from "./modules/doctor/routes/doctor.route";
+import userRouter from "./modules/user/user.route";
+import loginRouter from "./modules/user/login.route";
+import hospitalRouter from "./modules/hospital/hospital.route";
+import appointmentRouter from "./modules/appointment/appointment.route";
+import doctorRouter from "./modules/doctor/doctor.route";
+import patientRouter from "./modules/patient/patient.route";
 import verifyRouter from "./modules/commonRoute/verify.email";
+import paymentRouter from "./modules/payment/payment.route";
 
 const router = Router();
 
@@ -15,5 +17,8 @@ router.use('/verify', verifyRouter);
 router.use("/hospital", hospitalRouter);
 router.use('/appointment', appointmentRouter);
 router.use('/doctor', doctorRouter);
+router.use('/payment', paymentRouter);
+router.use('/patient', patientRouter);
+
 
 export default router;

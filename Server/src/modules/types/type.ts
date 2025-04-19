@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppointmentStatus } from './appointment.type';
-import { DoctorSpecialty } from '../doctor/model/doctor.model';
+import { DoctorSpecialty } from '../doctor/doctor.model';
 
 export interface UserAttributes {
     first_name?: string;
@@ -85,6 +85,13 @@ export interface UserResponseData {
   data: unknown | null;
 }
 
+export interface PatientResponseData {
+  statusCode: number;
+  status: string, // 'success' | 'fail' | 'error';
+  message: string;
+  data: unknown | null;
+}
+
 export interface EmailPayload {
   to: string;
   subject: string;
@@ -148,8 +155,8 @@ export interface JwtPayload {
 
 export interface SearchData {
   search?: string;
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -190,7 +197,7 @@ export interface AppointmentCreateDTO {
   date: string | Date;    // Allow both string and Date
   start_time: string;
   end_time: string;
-  reason?: string;        // Optional
+  // reason?: string;        // Optional
   note?: string;         // Required in DTO but missing in validation
   status: AppointmentStatus;
 }

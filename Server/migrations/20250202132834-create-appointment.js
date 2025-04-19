@@ -9,6 +9,20 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
+
+    // First, check if the payments table exists and remove the foreign key constraint if it does
+    const paymentsTableExists = await queryInterface.describeTable('payments')
+      .then(() => true)
+      .catch(() => false);
+
+    if (paymentsTableExists) {
+      await queryInterface.removeConstraint(
+        'payments',
+        'payments_appointment_id_fkey'
+      );
+    }
+
+    // Now create the appointments table
     await queryInterface.createTable('appointments', {
       id: {
         type: Sequelize.UUID,
@@ -16,21 +30,19 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4
       },
-      user_id: {
+      patient_id: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'users',
+          model: 'patients',
           key: 'id'
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        // onUpdate: 'CASCADE',
+        // onDelete: 'CASCADE'
       },
       status: {
-        type: Sequelize.ENUM('completed', 'scheduled', 'cancelled'),
-        allowNull: false,
-        defaultValue: 'scheduled',
-        comment: 'Current appointment state'
+        type: Sequelize.STRING,
+        allowNull: false
       },
       reminder_sent: {
         type: Sequelize.BOOLEAN,
@@ -78,15 +90,34 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
+      },
+      deleted_at: {
+        type: Sequelize.DATE,
+        allowNull: true
       }
-    })
+    });
+
+    // Add the foreign key constraint back to the payments table if it exists
+    if (paymentsTableExists) {
+      await queryInterface.addConstraint('payments', {
+        fields: ['appointment_id'],
+        type: 'foreign key',
+        name: 'payments_appointment_id_fkey',
+        references: {
+          table: 'appointments',
+          field: 'id'
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE'
+      });
+    }
   },
 
   async down (queryInterface, Sequelize) {
@@ -96,6 +127,14 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('appointments')
+
+    // First remove the foreign key constraint from the payments table
+    await queryInterface.removeConstraint(
+      'payments',
+      'payments_appointment_id_fkey'
+    );
+
+    // Then drop the appointments table
+    await queryInterface.dropTable('appointments');
   }
 };
