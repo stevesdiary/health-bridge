@@ -34,8 +34,13 @@ const UserController = {
   getOneUser: async (req: ExpressRequest, res: Response): Promise<Response> => {
     try {
       const user = await getOneUser(req.params.id);
-      return res.status(user.statusCode).send({ status: (user.status), message: (user.message), data: (user.data)})
+      return res.status(user.statusCode).send({ 
+        status: (user.status), 
+        message: (user.message), 
+        data: (user.data)
+      })
     } catch (error) {
+      console.log(error);
       return res.status(500).send({
         error: error
       })

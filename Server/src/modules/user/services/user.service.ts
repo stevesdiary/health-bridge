@@ -2,6 +2,7 @@ import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
 import { User } from "../user.model";
 import { UserResponseData } from "../../types/type";
+import { Patient } from "../../patient/patient.model";
 
 export const getAllUsers = async (): Promise<UserResponseData> => {
   try {
@@ -42,13 +43,43 @@ export const getAllUsers = async (): Promise<UserResponseData> => {
   }
 };
 
-export const getOneUser = async (id: string) => {
+export const getOneUser = async (id: string): Promise<UserResponseData> => {
   try {
     const user = await User.findByPk(id, {
       attributes: {
-        exclude: ["password", "createdAt", "updatedAt"]
-      }
+        exclude: ["password", "created_at", "updated_at"],
+      },
+        include: [
+          {
+            model: Patient,
+            as: "patient",
+            attributes: {
+              exclude: ["created_at", "updated_at", "deleted_at"]
+            }
+          }
+        ]
     });
+    if (user) {
+      const patient = await User.findOne( {
+        where: {
+          email: user.email
+        },
+        attributes:{
+          include: ['id']
+        },
+        include: [
+          {
+            model: Patient,
+            as: "patient",
+            attributes: {
+              exclude: ["created_at", "updated_at", "deleted_at"]
+            }
+          }
+        ]
+      });
+      console.log("PATIENT INFO FROM USER", patient?.dataValues.patient.id);
+    }
+    
     if (!user) {
       return {
         statusCode: 404,

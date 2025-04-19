@@ -4,16 +4,17 @@ import {
   Model, 
   DataType, 
   HasMany,
-  HasOne
+  HasOne,
+  ForeignKey
 } from 'sequelize-typescript';
 import { Appointment } from '../appointment/appointment.model';
 import { Patient } from '../patient/patient.model';
 
 export enum UserRole {
-  PATIENT = 'PATIENT',
-  ADMIN = 'ADMIN',
-  STAFF = 'STAFF',
-  DOCTOR = 'DOCTOR'
+  PATIENT = 'patient',
+  ADMIN = 'admin',
+  STAFF = 'staff',
+  DOCTOR = 'doctor'
 }
 
 @Table({
@@ -88,5 +89,6 @@ export class User extends Model {
   is_active!: boolean;
 
   @HasOne(() => Patient)
+  @ForeignKey(() => Patient)
   patient?: Patient;
 }

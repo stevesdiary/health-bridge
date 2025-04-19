@@ -1,5 +1,4 @@
 import { customAlphabet } from "nanoid";
-import * as yup from 'yup';
 import bcrypt from "bcrypt";
 import {Op} from 'sequelize'
 
@@ -7,7 +6,6 @@ import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
 import { User } from "../user.model";
 import sendEmail from "../../services/email.service";
-import { emailSchema } from "../../../utils/validator";
 
 
 const salt = process.env.BCRYPT_SALT || 10;
