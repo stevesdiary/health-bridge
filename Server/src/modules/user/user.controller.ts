@@ -3,7 +3,6 @@ import { idSchema, userUpdateSchema } from '../../utils/validator';
 import { UserResponseData } from '../types/type';
 import { Response, Request as ExpressRequest } from 'express';
 import { handleError } from '../../middlewares/error.handler';
-import { error } from 'console';
 
 
 

@@ -164,7 +164,15 @@ export const paymentService = {
           "Content-Type": "application/json"
         }
       });
-      
+      if (response.status !== 200) {
+        return {
+          statusCode: 400,
+          status: 'failure',
+          message: 'Payment verification failed',
+          data: null
+        };
+      }
+
       const verificationResponse = {
         statusCode: 200,
         status: 'success',
@@ -173,7 +181,25 @@ export const paymentService = {
       };
   
       await saveToRedis(cacheKey, JSON.stringify(verificationResponse), 3600);
-  
+      await Payment.update(
+        { 
+          payment_status: 'success',
+          payment_data: response.data.data
+        },
+        { where: { 
+          reference: verificationData.reference
+        }}
+      );
+
+      await Appointment.update(
+        { 
+          status: 'scheduled',
+        },
+        { where: { 
+          reference: verificationData.reference 
+        }},
+      )
+      
       return verificationResponse;
     } catch (error) {
       console.error('Payment verification error:', error);
