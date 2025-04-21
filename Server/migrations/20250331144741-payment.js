@@ -62,6 +62,9 @@ module.exports = {
       refund_amount: {
         type: Sequelize.INTEGER
       },
+      payment_data: {
+        type: Sequelize.JSON
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE

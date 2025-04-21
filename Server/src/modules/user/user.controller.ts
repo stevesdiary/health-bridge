@@ -2,6 +2,7 @@ import { deleteUser, getAllUsers, getOneUser, updateUser } from './services/user
 import { idSchema, userUpdateSchema } from '../../utils/validator';
 import { UserResponseData } from '../types/type';
 import { Response, Request as ExpressRequest } from 'express';
+import { handleError } from '../../middlewares/error.handler';
 
 
 
@@ -14,21 +15,10 @@ const UserController = {
         message: users.message,
         data: users.data
       });
-    } catch (error) {
-      const errorResponse: UserResponseData = {
-        statusCode: 500,
-        status: "error",
-        message: "internal server error",
-        data: null
+    } catch (error: any) {
+      const errorResponse = handleError(error as Error);
+      return res.status(errorResponse.statusCode).json(errorResponse.message);
       };
-
-      return res.status(errorResponse.statusCode).json({
-        status: errorResponse.status,
-        message: errorResponse.message,
-        data: errorResponse.data
-      });
-    }
-    
   },
 
   getOneUser: async (req: ExpressRequest, res: Response): Promise<Response> => {

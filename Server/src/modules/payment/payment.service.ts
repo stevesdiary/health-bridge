@@ -80,7 +80,6 @@ export const paymentService = {
         patient_id: user?.dataValues.patient.id,
         appointment_id: appointment.id
       };
-      console.log("PAYMENT INNITIATION DATA" ,paymentInitData)
   
       const cacheKey = `payment:initiate:${paymentInitData.email}`;
       // const nanoid = customAlphabet("1234567890");
@@ -153,10 +152,10 @@ export const paymentService = {
     try {
       const cacheKey = `payment:verify:${verificationData.reference}`;
       
-      const cachedVerification = await getFromRedis(cacheKey);
-      if (cachedVerification) {
-        return JSON.parse(cachedVerification);
-      }
+      // const cachedVerification = await getFromRedis(cacheKey);
+      // if (cachedVerification) {
+      //   return JSON.parse(cachedVerification);
+      // }
   
       const response = await axios.get(`https://api.paystack.co/transaction/verify/${verificationData.reference}`, {
         headers: {
@@ -164,16 +163,42 @@ export const paymentService = {
           "Content-Type": "application/json"
         }
       });
-      
+      if (response.status !== 200) {
+        return {
+          statusCode: 400,
+          status: 'failure',
+          message: 'Payment verification failed',
+          data: null
+        };
+      }
+
       const verificationResponse = {
         statusCode: 200,
         status: 'success',
         message: 'Payment verified successfully',
-        data: response.data.data
+        data: response.data
       };
   
       await saveToRedis(cacheKey, JSON.stringify(verificationResponse), 3600);
-  
+      await Payment.update(
+        { 
+          payment_status: 'completed',
+          payment_data: response.data
+        },
+        { where: { 
+          reference: verificationData.reference
+        }}
+      );
+
+      // await Appointment.update(
+      //   { 
+      //     status: 'scheduled',
+      //   },
+      //   { where: { 
+      //     reference: verificationData.reference 
+      //   }},
+      // )
+      
       return verificationResponse;
     } catch (error) {
       console.error('Payment verification error:', error);

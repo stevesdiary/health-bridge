@@ -102,6 +102,11 @@ export class Payment extends Model {
   })
   refund_amount?: number;
 
+  @Column({
+    type: DataType.JSON,
+  })
+  payment_data?: string 
+
   @Column(DataType.DATE)
   refund_date?: Date;
 
