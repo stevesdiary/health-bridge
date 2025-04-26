@@ -19,13 +19,22 @@ export const paymentService = {
     try {
       const { amount, email, currency, payment_provider, payment_method } = paymentData;
       
-      if (!paymentData) {
+      if (!paymentData || !paymentData.amount || !paymentData.email || !paymentData.currency || !paymentData.payment_provider || !paymentData.payment_method) {
         return {
           statusCode: 400,
           status: 'error',
           message: 'Invalid payment data',
           data: null
         };
+      }
+      
+      if (amount < 100) {
+        return {
+          statusCode: 400,
+          status: 'error',
+          message: 'Amount must be greater than 100',
+          data: null
+        }
       }
       const user = await User.findOne({
         where: {
@@ -82,21 +91,58 @@ export const paymentService = {
       };
   
       const cacheKey = `payment:initiate:${paymentInitData.email}`;
-      // const nanoid = customAlphabet("1234567890");
-      const generatePaystackReference = uuidv4();
-      
+      const generateReference = uuidv4();
+      const paystackCallback_url = `${process.env.PAYSTACK_CALLBACK_URL}`;
+      const koraPayCallback_url = `${process.env.KORAPAY_CALLBACK_URL}`;
+
       const params = {
         amount: amount * 100, // Convert to kobo
         email: email,
         currency: currency || 'NGN',
-        reference: generatePaystackReference,
-        callback_url: `${process.env.PAYSTACK_CALLBACK_URL}`
+        reference: generateReference,
+        
       };
+      // if (payment_provider === 'paystack') {
+        
+      // }
+
+        if (payment_provider === 'korapay') {
+          const apiSecret = 'process.env.KORA_SECRET_KEY';
+          const config = {
+            headers: {
+              'Authorization': `Bearer ${process.env.KORA_PUBLIC_KEY}`,
+              'Content-Type': 'application/json',
+            },
+          };
+          
+          const requestBody = {
+            amount: paymentData.amount,
+            currency: paymentData.currency || 'NGN',
+            payment_method: paymentData.payment_method,
+            email: paymentData.email,
+            metadata: {
+              custom_data: user.first_name,
+            },
+            // success_url: 'https://example.com/success',
+            // cancel_url: 'https://example.com/cancel',
+          };
+          
+          axios.post('https://api.korapay.com/checkout/v1/sessions', requestBody, config)
+          .then((response) => {
+              const checkoutSessionId = response.data.id;
+              const checkoutUrl = `https://checkout.korapay.com/${checkoutSessionId}`;
+              console.log(`Redirect to: ${checkoutUrl}`);
+            })
+          .catch((error) => {
+              console.error(error);
+            });
+        }
+
       const config = { headers: {
         'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
         'Content-Type': 'application/json'
       }};
-      const response = await axios.post(params.callback_url, params, config);
+      const response = await axios.post(paystackCallback_url, params, config);
       if (!response || response.status !== 200) {
         return {
           statusCode: 400,
@@ -122,7 +168,7 @@ export const paymentService = {
         payment_provider: 'paystack',
         currency: paymentData.currency || 'NGN',
         patient_id: user?.dataValues.patient.id,  // Use the patient_id from payment data
-        payment_method: 'debit_card',
+        payment_method: paymentData.payment_method,
         payment_date: new Date(),
         payment_status: 'pending',
         appointment_id: appointment.id
