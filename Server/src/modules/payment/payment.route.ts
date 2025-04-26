@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const paymentRouter = express.Router();
 
 import { Router, Request as ExpressRequest, Response } from 'express';
