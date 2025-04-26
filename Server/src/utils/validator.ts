@@ -1,7 +1,5 @@
 import * as yup from 'yup';
 
-import { AppointmentStatus } from '../modules/types/appointment.type';
-import { DoctorSpecialty } from '.././modules/types/doctor.type';
 export const userRegistrationSchema = yup.object().shape({
   first_name: yup
     .string()
