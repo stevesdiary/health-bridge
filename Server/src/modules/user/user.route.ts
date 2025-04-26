@@ -1,6 +1,5 @@
 import { Router, Request as ExpressRequest, Response } from 'express';
 
-import userRegistration from './register.user';
 import userController from './user.controller';
 import { TypedRequest } from '../types/type';
 import { checkRole } from '../../middlewares/authorisation';
@@ -9,19 +8,17 @@ import authentication from '../../middlewares/authentication';
 const userRouter = Router();
 
 userRouter.post("/register", async (req: TypedRequest, res: Response) => {
-  await userRegistration.register(req, res);
+  await userController.register(req, res);
 });
 
 userRouter.post("/verify",
   async (req: ExpressRequest, res: Response) => {
-  await userRegistration.verifyUser(req, res);
+  await userController.verifyUser(req, res);
 });
 
-userRouter.post("/resendcode", 
-  // authentication,
-  // checkRole(['admin']), 
+userRouter.post("/resendcode",
   async (req: ExpressRequest, res: Response) => {
-  await userRegistration.resendCode(req, res);
+  await userController.resendCode(req, res);
 });
 
 userRouter.get('/all',
