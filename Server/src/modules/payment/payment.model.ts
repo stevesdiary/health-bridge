@@ -9,7 +9,6 @@ import {
   UpdatedAt,
   PrimaryKey,
 } from 'sequelize-typescript';
-import { User } from '../user/user.model';
 import { Appointment } from '../appointment/appointment.model';
 import { Patient } from '../patient/patient.model';
 
