@@ -29,7 +29,7 @@ export const loginUser = async (email: string, password: string, res: Response) 
             maxAge: 3600000, // 1 hour
         });
 
-        return { statusCode: 200, status: "success", message: "User logged in", data: { token } };
+        return { statusCode: 200, status: "success", message: `Welcome back ${user.first_name}!`, data: { token } };
     } catch (error) {
         throw error;
     }
@@ -44,7 +44,7 @@ export const logoutUser = async (res: Response) => {
             path: '/',
         });
 
-        return { statusCode: 200, status: "success", message: "User logged out", data: [] };
+        return { statusCode: 200, status: "success", message: "Bye for now!", data: [] };
     } catch (error) {
         throw error;
     }
