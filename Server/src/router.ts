@@ -8,6 +8,7 @@ import doctorRouter from "./modules/doctor/doctor.route";
 import patientRouter from "./modules/patient/patient.route";
 import verifyRouter from "./modules/commonRoute/verify.email";
 import paymentRouter from "./modules/payment/payment.route";
+import notificationRouter from "./modules/notification/notification.route";
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.use('/appointment', appointmentRouter);
 router.use('/doctor', doctorRouter);
 router.use('/payment', paymentRouter);
 router.use('/patient', patientRouter);
+router.use('/notification', notificationRouter);
 
 
 export default router;
