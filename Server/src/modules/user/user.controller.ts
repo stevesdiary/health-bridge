@@ -4,7 +4,7 @@ import { Response, Request as ExpressRequest } from 'express';
 import { deleteUser, getAllUsers, getOneUser, updateUser } from './services/user.service';
 import { idSchema, userUpdateSchema } from '../../utils/validator';
 import { UserResponseData } from '../types/type';
-import { handleError } from '../../middlewares/error.handler';
+// import { handleError } from '../../middlewares/error.handler';
 import { verifyUser, registerUser, resendCode } from './services/user.registration';
 import { userRegistrationSchema, userVerificationSchema, emailSchema } from '../../utils/validator';
 import { TypedRequest, ValidationErrorResponse,  } from '../types/type';
@@ -113,8 +113,13 @@ const UserController = {
         data: users.data
       });
     } catch (error: any) {
-      const errorResponse = handleError(error as Error);
-      return res.status(errorResponse.statusCode).json(errorResponse.message);
+      // const errorResponse = handleError(error as Error);
+      // return res.status(errorResponse.statusCode).json(errorResponse.message);
+        return res.status(500).json({
+          status: 'error',
+          message: 'An unexpected error occurred',
+          data: error
+        });
       };
   },
 
