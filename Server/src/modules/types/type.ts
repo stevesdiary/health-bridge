@@ -103,6 +103,16 @@ export interface EmailResponse {
   status: string;
   message: string;
   data: unknown;
+  accepted: string[];
+  response: string;
+  messageId: string;
+}
+
+export interface NotificationResponse {
+  statusCode: number;
+  status: string;
+  message: string;
+  data?: any;
 }
 
 export interface loginData {
