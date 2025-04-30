@@ -145,7 +145,7 @@ class NotificationService {
     }
   }
 
-  async sendAppointmentCancellation(appointment_id: string, reason: string): Promise<void> {
+  async sendAppointmentCancellation(appointment_id: string, reason: string): Promise<NotificationResponse> {
     try {
       const appointment = await Appointment.findOne({
         where: { id: appointment_id },
@@ -177,7 +177,7 @@ class NotificationService {
         Health Bridge Team
       `;
 
-      await sendEmail({ to: appointment.patient?.user?.email as string, subject: 'Appointment Cancellation', text: message });
+      const sendCancellationEmail = await sendEmail({ to: appointment.patient?.user?.email as string, subject: 'Appointment Cancellation', text: message });
       await appointment.update({
         status: 'cancelled',
         reason: reason
@@ -186,6 +186,12 @@ class NotificationService {
           id: appointment_id
         }
       })
+      return {
+        statusCode: 200,
+        status:'success',
+        message: 'Appointment cancelled successfuly and cancellation email sent to the patient',
+        data: sendCancellationEmail.response
+      }
 
     } catch (error) {
       console.error('Error sending appointment cancellation:', error);
