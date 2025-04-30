@@ -22,29 +22,38 @@ export async function sendEmail(emailPayload: EmailPayload): Promise<EmailRespon
 
   try {
     const info = await transporter.sendMail (mailOptions);
-    console.log('Message sent: ', info.response);
+    console.log('Message sent: ', info.messageId);
     
     if (!info) {
-      console.error('Email not sent:', info);
+      // console.error('Email not sent:', info);
       return {
         statusCode: 400,
         status: 'fail',
         message: 'Email not sent',
-        data: info || null
+        data: null,
+        accepted: [],
+        response: '',
+        messageId: ''
       }
     }
     return {
       statusCode: 200,
       status: 'success',
       message: 'Email sent',
-      data: info
+      data: info.accepted || [],
+      accepted: info.accepted || [],
+      response: info.response || '',
+      messageId: info.messageId || ''
     }
   } catch (error) {
     return {
       statusCode: 500,
       status: 'error',
       message: 'Error sending email',
-      data: error
+      data: error,
+      accepted: [],
+      response: '',
+      messageId: ''
     }
   }
 }
