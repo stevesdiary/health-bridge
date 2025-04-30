@@ -37,8 +37,8 @@ module.exports = {
           model: 'patients',
           key: 'id'
         },
-        // onUpdate: 'CASCADE',
-        // onDelete: 'CASCADE'
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       status: {
         type: Sequelize.STRING,
@@ -54,6 +54,9 @@ module.exports = {
         validate: {
           len: [0, 500]
         }
+      },
+      reason: {
+        type: Sequelize.STRING
       },
       date: {
         type: Sequelize.DATEONLY,
