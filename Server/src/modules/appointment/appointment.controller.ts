@@ -200,7 +200,16 @@ const appointmentController = {
   cancelAppointment: async (req: ExpressRequest, res: Response) => {
     try {
       const id = await idSchema.validate(req.params.id, {abortEarly: false});
-      const cancelAppoinntmet = await appointmentService.cancelAppointment(id);
+      const reason = await yup.string().required('Reason is required').validate(req.body.reason, {abortEarly: false});
+      if (!reason) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failed, Reason is required',
+          errors: 'Invalid Reason'
+        });
+      }
+      // const cancelAppointmentData = { id, reason}
+      const cancelAppoinntmet = await appointmentService.cancelAppointment( id, reason);
       return {
         statusCode: cancelAppoinntmet?.statusCode,
         status: cancelAppoinntmet?.status,
