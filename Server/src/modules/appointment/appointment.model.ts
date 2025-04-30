@@ -1,5 +1,5 @@
 import { Column, Table, Model, IsUUID, DataType, Default, PrimaryKey, AllowNull, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
-import { Hospital } from "../hospital/hospital.model";
+import { Hospital } from '../hospital/hospital.model';
 import { Doctor } from "../doctor/doctor.model";
 import { Patient } from "../patient/patient.model";
 
@@ -12,6 +12,12 @@ export enum AppointmentStatus {
   in_progress = 'in_progress',
   rescheduled = 'rescheduled',
   waiting_list = 'waiting_list',
+}
+
+export enum Reason {
+  doctor_unavalilable = 'doctor_unavailable',
+  hospital_not_open = 'hospital_not_open',
+  other_reasons = 'other_reasons'
 }
 
 @Table({
@@ -42,11 +48,6 @@ export class Appointment extends Model {
   })
   doctor_id!: string;
 
-  // @Column({
-  //   type: DataType.TEXT
-  // })
-  // reason?: string;
-
   @Column({
     type: DataType.BOOLEAN,
     defaultValue: false
@@ -58,7 +59,12 @@ export class Appointment extends Model {
     allowNull: false,
     defaultValue: 'pending'
   })
-  status!: string
+  status!: string;
+
+  @Column({
+    type: DataType.STRING
+  })
+  reason?: string;
 
   @Column({
     type: DataType.STRING,
