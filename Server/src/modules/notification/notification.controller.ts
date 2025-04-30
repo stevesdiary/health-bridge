@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import NotificationService from '../notification/notification.service';
 // import { handleError } from '../../middlewares/error.handler';
+import { idSchema } from '../../utils/validator';
 
 const notificationController = {
   sendReminder: async (req: Request, res: Response) => {
     try {
-      const { appointment_id } = req.params;
+      const appointment_id = await idSchema.validate(req.params, {abortEarly: false});
       const notificationService = NotificationService.getInstance();
       
       const notify = await notificationService.sendAppointmentReminder(appointment_id);
@@ -54,11 +55,12 @@ const notificationController = {
       const { reason } = req.body;
       const notificationService = NotificationService.getInstance();
       
-      await notificationService.sendAppointmentCancellation(appointment_id, reason);
+      const response = await notificationService.sendAppointmentCancellation(appointment_id, reason);
       
-      return res.status(200).json({
-        status: 'success',
-        message: 'Cancellation notification sent successfully'
+      return res.status(response.statusCode).json({
+        status: response.status,
+        message: response.message,
+        data: response.data
       });
     } catch (error) {
       // const errorResponse = handleError(error);
