@@ -8,6 +8,8 @@ import { Doctor } from '../doctor/doctor.model';
 import { ApiResponse, SearchData } from '../types/type';
 import sequelize from '../../core/database';
 import { Patient } from '../patient/patient.model';
+import NotificationService from '../notification/notification.service';
+import sendEmail from '../services/email.service';
 
 
 
@@ -91,7 +93,7 @@ const appointmentService = {
         return {
           statusCode: 404,
           status: 'fail',
-          message: 'Required parameters not found (Doctor,User, Hospital)',
+          message: 'Required parameters not found for one of (Doctor,User, Hospital)',
           data: null
         };
       }
@@ -106,17 +108,6 @@ const appointmentService = {
         };
       }
 
-      // if (!hospital) {
-      //   await transaction.rollback();
-      //   return {
-      //     statusCode: 404,
-      //     status: 'fail',
-      //     message: 'Hospital not found',
-      //     data: null
-      //   };
-      // }
-
-      // Create appointment
       const appointment = await Appointment.create(
         {
           ...appointmentData,
@@ -225,8 +216,8 @@ const appointmentService = {
   updateAppointment: async (id: string, status: string) => {
     try {
       const update = await Appointment.update(
-        { status: status},
-        {where: {id}},
+        { status: status },
+        { where: {id} },
       )
       if (update) {
         return {
@@ -237,23 +228,28 @@ const appointmentService = {
         }
       }
     } catch (error) {
-      console.log('Error cancelling appoitmet', error);
+      console.log('Error updating appointment', error);
       throw error;
     }
   },
 
-  cancelAppointment: async (id: string) => {
+  cancelAppointment: async (id: string, reason: string) => {
     try {
       const cancel = await Appointment.update(
-        { status: 'cancelled'},
-        {where: {id}},
+        { status: 'cancelled',
+          reason: reason
+        },
+        { where: { id } },
       )
+
       if (cancel) {
+        const sendCancellationEmail = await NotificationService.getInstance().sendAppointmentCancellation(id, reason);
+        
         return {
           statusCode: 200,
           status: 'success',
-          message: 'Appointment cancelled',
-          data: null
+          message: 'Appointment cancelled and notification email sent to patient',
+          data: sendCancellationEmail
         }
       }
     } catch (error) {
@@ -265,14 +261,14 @@ const appointmentService = {
   deleteAppointmentRecord: async (id: string) => {
     try {
       const deleteRecord = await Appointment.destroy(
-        {where: {id}},
+        { where: { id } },
       )
       if (deleteRecord > 0) {
         return {
           statusCode: 200,
           status: 'success',
           message: 'Appointment record deleted',
-          data: null
+          data: deleteRecord
         }
       }
 
@@ -290,4 +286,3 @@ const appointmentService = {
 }
 
 export default appointmentService;
-
